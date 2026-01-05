@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Spanish Flashcards (EN → ES)</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Spanish Flashcards</title>
 
   <style>
     body {
@@ -12,53 +13,110 @@
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      background: #f6f6f6;
-      font-family: "Helvetica Neue", Arial, sans-serif;
+      background: #0b0b0b;
+      font-family: system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+      color: #f3f3f3;
     }
 
     .card {
-      width: 70vw;
-      height: 40vh;
-      background: white;
-      border-radius: 20px;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+      width: min(92vw, 1100px);
+      height: min(55vh, 520px);
+      background: #141414;
+      border-radius: 28px;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.45);
       display: flex;
       justify-content: center;
       align-items: center;
       text-align: center;
       cursor: pointer;
       user-select: none;
+      border: 2px solid rgba(255,255,255,0.08);
+      padding: 28px;
+      position: relative;
     }
 
     .word {
-      font-size: 5rem;
-      font-weight: 600;
+      font-size: clamp(2.6rem, 6vw, 5.4rem);
+      font-weight: 650;
+      line-height: 1.1;
     }
 
-    .hint {
-      margin-top: 30px;
+    .sub {
+      margin-top: 14px;
       font-size: 1rem;
-      color: #888;
+      opacity: 0.7;
       text-align: center;
+    }
+
+    .badge {
+      position: absolute;
+      top: 16px;
+      right: 18px;
+      font-size: 0.95rem;
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.06);
+      opacity: 0.9;
+    }
+
+    .controls {
+      margin-top: 18px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+    }
+
+    button {
+      background: #1f1f1f;
+      color: #f3f3f3;
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 14px;
+      padding: 14px 18px;
+      font-size: 1.05rem;
+      font-weight: 650;
+      cursor: pointer;
+      min-width: 170px;
+    }
+
+    button:active { transform: translateY(1px); }
+
+    .status {
+      margin-top: 12px;
+      font-size: 0.95rem;
+      opacity: 0.75;
+      text-align: center;
+      max-width: min(92vw, 1100px);
     }
   </style>
 </head>
 
 <body>
-
-  <div class="card" id="card">
-    <div class="word" id="word"></div>
+  <div class="card" id="card" role="button" aria-label="Flashcard (click to flip)">
+    <div class="badge" id="badge">EN → ES</div>
+    <div>
+      <div class="word" id="word"></div>
+      <div class="sub" id="sub"></div>
+    </div>
   </div>
 
-  <div class="hint">
-    English → Spanish · Click / Space = flip · H = hard · N / P = deck
+  <div class="controls">
+    <button id="prevBtn">Prev (←)</button>
+    <button id="flipBtn">Flip (Space)</button>
+    <button id="nextBtn">Next (→)</button>
+    <button id="unknownBtn">Don’t know (U)</button>
+    <button id="reviewUnknownBtn">Review Unknown (R)</button>
+    <button id="clearUnknownBtn">Clear Unknown</button>
   </div>
+
+  <div class="status" id="status"></div>
 
 <script>
 /* =========================
-   VOCABULARY
+   1) PASTE YOUR VOCAB HERE
+   Use { en: "...", es: "..." }
    ========================= */
-
 const ALL_CARDS = [
   // ===== TRAVEL / TRIPS =====
   { en: "to land", es: "aterrizar" },
@@ -475,96 +533,234 @@ const ALL_CARDS = [
    DECK SYSTEM
    ========================= */
 
-const DECK_SIZE = 200;
-let deckIndex = parseInt(localStorage.getItem("deckIndex") || "0", 10);
 
-function getDeck() {
+/* =========================
+   2) SETTINGS
+   ========================= */
+const DECK_SIZE = 200;
+
+/* =========================
+   3) STORAGE KEYS
+   ========================= */
+const LS_DECK = "deckIndex";
+const LS_UNKNOWN = "unknownCards_v1"; // stores array of keys
+const LS_REVIEW_UNKNOWN = "reviewUnknownOnly";
+
+/* =========================
+   4) HELPERS
+   ========================= */
+function cardKey(card) {
+  // Stable ID: English + Spanish (handles duplicates better than using only one side)
+  return `${card.en}|||${card.es}`;
+}
+
+function loadUnknownSet() {
+  try {
+    const arr = JSON.parse(localStorage.getItem(LS_UNKNOWN) || "[]");
+    return new Set(arr);
+  } catch {
+    return new Set();
+  }
+}
+
+function saveUnknownSet(setObj) {
+  localStorage.setItem(LS_UNKNOWN, JSON.stringify(Array.from(setObj)));
+}
+
+function maxDeckIndex() {
+  return Math.max(0, Math.floor((ALL_CARDS.length - 1) / DECK_SIZE));
+}
+
+/* =========================
+   5) DECK + FILTERS
+   ========================= */
+let deckIndex = parseInt(localStorage.getItem(LS_DECK) || "0", 10);
+let unknownSet = loadUnknownSet();
+let reviewUnknownOnly = (localStorage.getItem(LS_REVIEW_UNKNOWN) || "0") === "1";
+
+function getDeckSlice() {
   const start = deckIndex * DECK_SIZE;
   return ALL_CARDS.slice(start, start + DECK_SIZE);
 }
 
-let flashcards = getDeck();
+let baseDeck = getDeckSlice();
+
+function getActiveDeck() {
+  if (!reviewUnknownOnly) return baseDeck;
+  return baseDeck.filter(c => unknownSet.has(cardKey(c)));
+}
+
+let activeDeck = getActiveDeck();
 
 /* =========================
-   STATE
+   6) STATE
    ========================= */
-
-// IMPORTANT: English shows FIRST
+// ENGLISH shows first
 let showingSpanish = false;
 let index = 0;
 
-let hardCards = JSON.parse(localStorage.getItem("hardCards")) || [];
-
 /* =========================
-   ELEMENTS
+   7) ELEMENTS
    ========================= */
-
 const wordEl = document.getElementById("word");
-const card = document.getElementById("card");
+const subEl = document.getElementById("sub");
+const statusEl = document.getElementById("status");
+const badgeEl = document.getElementById("badge");
+
+const cardEl = document.getElementById("card");
+const prevBtn = document.getElementById("prevBtn");
+const flipBtn = document.getElementById("flipBtn");
+const nextBtn = document.getElementById("nextBtn");
+const unknownBtn = document.getElementById("unknownBtn");
+const reviewUnknownBtn = document.getElementById("reviewUnknownBtn");
+const clearUnknownBtn = document.getElementById("clearUnknownBtn");
 
 /* =========================
-   FUNCTIONS
+   8) UI + LOGIC
    ========================= */
+function currentCard() {
+  if (!activeDeck.length) return null;
+  return activeDeck[index];
+}
+
+function updateStatus() {
+  const totalDecks = maxDeckIndex() + 1;
+  const deckStart = deckIndex * DECK_SIZE + 1;
+  const deckEnd = Math.min((deckIndex + 1) * DECK_SIZE, ALL_CARDS.length);
+
+  const mode = reviewUnknownOnly ? "MODE: Unknown only" : "MODE: All cards";
+  const unknownCountInDeck = baseDeck.filter(c => unknownSet.has(cardKey(c))).length;
+
+  statusEl.textContent =
+    `Deck ${deckIndex + 1}/${totalDecks} · Card ${activeDeck.length ? (index + 1) : 0}/${activeDeck.length} · ${mode} · Unknown in this deck: ${unknownCountInDeck} · Words ${deckStart}-${deckEnd}`;
+}
 
 function render() {
-  wordEl.textContent = showingSpanish
-    ? flashcards[index].es
-    : flashcards[index].en;
+  activeDeck = getActiveDeck();
+
+  if (!activeDeck.length) {
+    wordEl.textContent = reviewUnknownOnly
+      ? "No unknown cards in this deck"
+      : "No cards in this deck";
+    subEl.textContent = reviewUnknownOnly
+      ? "Press R to exit Unknown mode, or mark cards as unknown first."
+      : "";
+    badgeEl.textContent = reviewUnknownOnly ? "Unknown only" : "EN → ES";
+    updateStatus();
+    return;
+  }
+
+  // Keep index in range after filtering
+  index = Math.max(0, Math.min(index, activeDeck.length - 1));
+
+  const c = currentCard();
+  const isUnknown = unknownSet.has(cardKey(c));
+
+  wordEl.textContent = showingSpanish ? c.es : c.en;
+  subEl.textContent = showingSpanish ? "Spanish" : "English";
+
+  badgeEl.textContent = isUnknown ? "UNKNOWN" : (reviewUnknownOnly ? "Unknown only" : "EN → ES");
+
+  updateStatus();
 }
 
 function flip() {
-  if (!showingSpanish) {
-    // English → Spanish
-    showingSpanish = true;
-  } else {
-    // Move to next card (back to English)
-    showingSpanish = false;
-    index = (index + 1) % flashcards.length;
-  }
+  // Only flips the current card
+  showingSpanish = !showingSpanish;
   render();
 }
 
-function markHard() {
-  const c = flashcards[index];
-  if (!hardCards.find(x => x.es === c.es)) {
-    hardCards.push(c);
-    localStorage.setItem("hardCards", JSON.stringify(hardCards));
-    alert(`Saved: ${c.en}`);
-  }
+function nextCard() {
+  if (!activeDeck.length) return;
+  index = (index + 1) % activeDeck.length;
+  showingSpanish = false; // always start card on English
+  render();
 }
 
-function loadDeck(newDeck) {
-  const maxDeck = Math.floor((ALL_CARDS.length - 1) / DECK_SIZE);
-  deckIndex = Math.max(0, Math.min(newDeck, maxDeck));
-  localStorage.setItem("deckIndex", deckIndex);
-  flashcards = getDeck();
+function prevCard() {
+  if (!activeDeck.length) return;
+  index = (index - 1 + activeDeck.length) % activeDeck.length;
+  showingSpanish = false; // always start card on English
+  render();
+}
+
+function toggleUnknown() {
+  const c = currentCard();
+  if (!c) return;
+
+  const k = cardKey(c);
+  if (unknownSet.has(k)) unknownSet.delete(k);
+  else unknownSet.add(k);
+
+  saveUnknownSet(unknownSet);
+
+  // If we are in "unknown only" mode and you unmark the current card,
+  // it may disappear from the filtered list — render handles that.
+  render();
+}
+
+function toggleReviewUnknownOnly() {
+  reviewUnknownOnly = !reviewUnknownOnly;
+  localStorage.setItem(LS_REVIEW_UNKNOWN, reviewUnknownOnly ? "1" : "0");
+  index = 0;
+  showingSpanish = false;
+  render();
+}
+
+function clearUnknown() {
+  if (!confirm("Clear ALL 'unknown' marks?")) return;
+  unknownSet = new Set();
+  saveUnknownSet(unknownSet);
+  index = 0;
+  showingSpanish = false;
+  render();
+}
+
+function loadDeck(newDeckIndex) {
+  deckIndex = Math.max(0, Math.min(newDeckIndex, maxDeckIndex()));
+  localStorage.setItem(LS_DECK, String(deckIndex));
+
+  baseDeck = getDeckSlice();
   index = 0;
   showingSpanish = false;
   render();
 }
 
 /* =========================
-   EVENTS
+   9) EVENTS
    ========================= */
-
-card.addEventListener("click", flip);
+cardEl.addEventListener("click", flip);
+flipBtn.addEventListener("click", flip);
+nextBtn.addEventListener("click", nextCard);
+prevBtn.addEventListener("click", prevCard);
+unknownBtn.addEventListener("click", toggleUnknown);
+reviewUnknownBtn.addEventListener("click", toggleReviewUnknownOnly);
+clearUnknownBtn.addEventListener("click", clearUnknown);
 
 document.addEventListener("keydown", e => {
-  if (e.code === "Space") {
-    e.preventDefault();
-    flip();
-  }
-  if (e.key.toLowerCase() === "h") markHard();
+  // Flip
+  if (e.code === "Space") { e.preventDefault(); flip(); }
+
+  // Navigate
+  if (e.key === "ArrowRight") nextCard();
+  if (e.key === "ArrowLeft") prevCard();
+
+  // Unknown toggle
+  if (e.key.toLowerCase() === "u") toggleUnknown();
+
+  // Review unknown mode
+  if (e.key.toLowerCase() === "r") toggleReviewUnknownOnly();
+
+  // Deck navigation (optional)
   if (e.key.toLowerCase() === "n") loadDeck(deckIndex + 1);
   if (e.key.toLowerCase() === "p") loadDeck(deckIndex - 1);
 });
 
 /* =========================
-   START
+   10) START
    ========================= */
-
 render();
 </script>
-
 </body>
 </html>
+
