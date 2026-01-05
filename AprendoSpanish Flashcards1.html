@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Spanish Flashcards (EN → ES)</title>
+
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background: #f6f6f6;
+      font-family: "Helvetica Neue", Arial, sans-serif;
+    }
+
+    .card {
+      width: 70vw;
+      height: 40vh;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .word {
+      font-size: 5rem;
+      font-weight: 600;
+    }
+
+    .hint {
+      margin-top: 30px;
+      font-size: 1rem;
+      color: #888;
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="card" id="card">
+    <div class="word" id="word"></div>
+  </div>
+
+  <div class="hint">
+    English → Spanish · Click / Space = flip · H = hard · N / P = deck
+  </div>
+
+<script>
+/* =========================
+   VOCABULARY
+   ========================= */
+
+const ALL_CARDS = [
+  // ===== TRAVEL / TRIPS =====
+  { en: "to land", es: "aterrizar" },
+  { en: "to cancel a reservation", es: "cancelar una reservación" },
+  { en: "to buy the tickets", es: "comprar los billetes" },
+  { en: "to unpack", es: "deshacer la(s) maleta(s)" },
+  { en: "to take off", es: "despegar" },
+  { en: "to check luggage", es: "facturar la(s) maleta(s)" },
+  { en: "to take pictures", es: "(sacar) fotos" },
+  { en: "to pack", es: "hacer la(s) maleta(s)" },
+  { en: "to wait in line", es: "hacer cola/fila" },
+  { en: "to make a reservation", es: "hacer una reservación" },
+  { en: "to go camping", es: "ir de camping, acampar" },
+  { en: "to check out (hotel)", es: "irse del hotel" },
+  { en: "to arrive on time", es: "llegar a tiempo" },
+  { en: "to arrive late / to be late", es: "llegar tarde" },
+  { en: "to be delayed", es: "llegar con retraso" },
+  { en: "to get on (train/plane)", es: "montarse en / subirse a" },
+  { en: "to check in (hotel)", es: "registrarse en el hotel (hacer el check-in)" },
+  { en: "to get off (plane/train/bus)", es: "salir del avión, tren, autobús" },
+  { en: "to apply for a visa", es: "solicitar una visa" },
+  { en: "to board", es: "abordar" },
+
+  { en: "airport", es: "el aeropuerto" },
+  { en: "flight attendant", es: "el/la asistente (auxiliar) de vuelo" },
+  { en: "seat", es: "el asiento" },
+  { en: "customs", es: "la aduana" },
+  { en: "ticket", es: "el boleto" },
+  { en: "one-way ticket", es: "el boleto de ida" },
+  { en: "round-trip ticket", es: "el boleto de ida y vuelta" },
+  { en: "camera", es: "la cámara" },
+  { en: "cancellation", es: "la cancelación" },
+  { en: "baggage cart", es: "el carrito" },
+  { en: "baggage conveyor belt", es: "la cinta de equipaje" },
+  { en: "resort (all inclusive)", es: "el centro turístico (todo incluido)" },
+  { en: "safety belt", es: "el cinturón de seguridad" },
+  { en: "destination", es: "el destino" },
+  { en: "address", es: "la dirección" },
+  { en: "luggage", es: "el equipaje" },
+  { en: "carry-on", es: "el equipaje de mano" },
+  { en: "layover / stopover", es: "la escala" },
+  { en: "field trip / excursion", es: "la excursión" },
+  { en: "foreigner", es: "el/la extranjero/a" },
+  { en: "brochure", es: "el folleto" },
+  { en: "guide", es: "el/la guía" },
+  { en: "accommodation", es: "el hospedaje" },
+  { en: "itinerary", es: "el itinerario" },
+  { en: "arrival", es: "la llegada / el arribo" },
+  { en: "suitcase", es: "la maleta" },
+  { en: "currency / exchange rate", es: "la moneda / el cambio" },
+  { en: "passport", es: "el pasaporte" },
+  { en: "driver’s license", es: "el permiso de conducir" },
+  { en: "reception (front desk)", es: "la recepción" },
+  { en: "receptionist", es: "el/la recepcionista" },
+  { en: "requirement", es: "el requisito" },
+  { en: "delay", es: "el retraso / la demora" },
+  { en: "waiting room", es: "la sala de espera" },
+  { en: "departure / departure time", es: "la salida / hora de salida" },
+  { en: "boarding pass", es: "la tarjeta de embarque" },
+  { en: "tent", es: "la tienda de campaña" },
+  { en: "trip", es: "el viaje" },
+  { en: "visa", es: "la visa / el visado" },
+  { en: "visitor", es: "el/la visitante" },
+  { en: "flight", es: "el vuelo" },
+  { en: "direct flight", es: "el vuelo directo / sin escalas" },
+  { en: "flight with layovers", es: "el vuelo con escalas / con escala" },
+
+  { en: "bus", es: "el autobús" },
+  { en: "plane", es: "el avión" },
+  { en: "boat / ship", es: "el barco" },
+  { en: "bicycle", es: "la bicicleta" },
+  { en: "horse", es: "el caballo" },
+  { en: "car", es: "el carro (coche, auto)" },
+  { en: "cruise", es: "el crucero" },
+  { en: "taxi", es: "el taxi" },
+  { en: "train", es: "el tren" },
+
+  { en: "to go for a walk/ride", es: "dar un paseo" },
+  { en: "to discover", es: "descubrir" },
+  { en: "to say goodbye", es: "despedirse de" },
+  { en: "to start", es: "empezar" },
+  { en: "to wait", es: "esperar" },
+  { en: "to stay (at)", es: "hospedarse (en)" },
+  { en: "to arrive", es: "llegar / arribar" },
+  { en: "to take care of", es: "ocuparse (de)" },
+  { en: "to go sightseeing", es: "recorrer" },
+  { en: "to pick up", es: "recoger" },
+  { en: "to return", es: "regresar" },
+  { en: "to meet (with)", es: "reunirse (con)" },
+  { en: "to leave / depart", es: "salir / partir" },
+  { en: "to fly", es: "volar" },
+  { en: "to return", es: "volver" },
+
+  // ===== MONEY / WORK / ECONOMY =====
+  { en: "taxes", es: "los impuestos" },
+  { en: "cover letter", es: "la carta de presentación" },
+  { en: "recommendation letter", es: "la carta de recomendación" },
+  { en: "company", es: "la compañía" },
+  { en: "unemployment", es: "el desempleo" },
+  { en: "employment", es: "el empleo" },
+  { en: "employee", es: "empleado/a" },
+  { en: "employer", es: "el empleador" },
+  { en: "company / business", es: "la empresa" },
+  { en: "manager", es: "el gerente" },
+  { en: "strike", es: "la huelga" },
+  { en: "inflation", es: "la inflación" },
+  { en: "boss", es: "el/la jefe/a" },
+  { en: "developed countries", es: "los países desarrollados" },
+  { en: "developing countries", es: "los países en vías de desarrollo" },
+  { en: "internship", es: "la pasantía" },
+  { en: "poverty", es: "la pobreza" },
+  { en: "job position", es: "el puesto" },
+  { en: "unemployment rate", es: "la tasa de desempleo" },
+  { en: "wealth", es: "la riqueza" },
+  { en: "job application", es: "la solicitud (de empleo)" },
+  { en: "exports", es: "las exportaciones" },
+  { en: "imports", es: "las importaciones" },
+  { en: "GDP", es: "el producto interno bruto (PIB)" },
+  { en: "stocks", es: "las acciones" },
+  { en: "loan", es: "el préstamo" },
+  { en: "salary", es: "el sueldo" },
+  { en: "monthly budget", es: "el presupuesto (mensual)" },
+  { en: "expenses", es: "los gastos" },
+  { en: "debt", es: "la deuda" },
+  { en: "savings account", es: "la cuenta de ahorros" },
+  { en: "checking account", es: "la cuenta corriente" },
+  { en: "to get a job", es: "conseguir (trabajo)" },
+  { en: "to hire", es: "contratar" },
+  { en: "to fire", es: "despedir" },
+  { en: "to manage (well/poorly)", es: "manejar (bien/mal)" },
+  { en: "to pay off at once", es: "pagar de una vez" },
+  { en: "to export", es: "exportar" },
+  { en: "to import", es: "importar" },
+  { en: "to earn / win", es: "ganar" },
+  { en: "to spend", es: "gastar" },
+  { en: "to save (money/resources)", es: "ahorrar" },
+  { en: "to apply (for a job)", es: "solicitar (empleo)" },
+
+  // ===== ENVIRONMENT =====
+  { en: "to conserve", es: "conservar" },
+  { en: "to contaminate", es: "contaminar" },
+  { en: "deforestation", es: "la desforestación" },
+  { en: "pesticides", es: "los pesticidas" },
+  { en: "petroleum", es: "el petróleo" },
+  { en: "biodegradable product", es: "el producto biodegradable" },
+  { en: "earth", es: "la tierra" },
+  { en: "landfill", es: "el basurero" },
+  { en: "plastic/glass bottle", es: "la botella (de plástico/de vidrio)" },
+  { en: "cardboard box", es: "la caja de cartón" },
+  { en: "climate change", es: "el cambio climático" },
+  { en: "fossil fuels", es: "los combustibles fósiles" },
+  { en: "greenhouse gas emissions", es: "las emisiones de gases de efecto invernadero" },
+  { en: "water/air pollution", es: "la contaminación (del agua/aire)" },
+  { en: "shortage", es: "la escasez" },
+  { en: "endangered species", es: "las especies en peligro de extinción" },
+  { en: "factory", es: "la fábrica" },
+  { en: "lack of", es: "la falta de" },
+  { en: "aluminum can", es: "la lata de aluminio" },
+  { en: "nature", es: "la naturaleza" },
+  { en: "disposable product", es: "el producto desechable" },
+  { en: "natural resources", es: "los recursos naturales" },
+  { en: "trash", es: "la basura" },
+  { en: "flood", es: "la inundación" },
+  { en: "tornado", es: "el tornado" },
+  { en: "tsunami", es: "el tsunami" },
+  { en: "extreme temperatures", es: "las temperaturas extremas" },
+  { en: "avalanche", es: "la avalancha" },
+  { en: "drought", es: "la sequía" },
+  { en: "hurricane", es: "el huracán" },
+  { en: "forest fire", es: "el incendio forestal" },
+  { en: "volcanic eruption", es: "la erupción volcánica" },
+  { en: "earthquake", es: "el terremoto" },
+  { en: "to build", es: "construir" },
+  { en: "to decompose", es: "descomponer" },
+  { en: "to waste", es: "desperdiciar" },
+  { en: "to get rid of", es: "desechar" },
+  { en: "to stop", es: "dejar de" },
+  { en: "to throw out", es: "echar / tirar / botar" },
+  { en: "to protect", es: "proteger" },
+  { en: "to reduce", es: "reducir" },
+  { en: "to reuse", es: "reusar" },
+  { en: "to recycle", es: "reciclar" },
+  { en: "to save (animals/people)", es: "salvar" },
+
+  // ===== PRESS / ARTS =====
+  { en: "press", es: "la prensa" },
+  { en: "media", es: "los medios de comunicación" },
+  { en: "event / happening", es: "el acontecimiento" },
+  { en: "report", es: "el reportaje" },
+  { en: "newspaper", es: "el periódico" },
+  { en: "news item", es: "la noticia" },
+  { en: "headline", es: "el titular" },
+  { en: "subheadline", es: "la bajada" },
+  { en: "press conference", es: "la rueda de prensa" },
+  { en: "censorship", es: "la censura" },
+  { en: "interview", es: "la entrevista" },
+  { en: "to interview", es: "entrevistar" },
+  { en: "to inform", es: "informar" },
+  { en: "to investigate", es: "investigar" },
+  { en: "to censor", es: "censurar" },
+
+  { en: "script", es: "el guión" },
+  { en: "stage", es: "el escenario" },
+  { en: "lines", es: "las líneas" },
+  { en: "character", es: "el personaje" },
+  { en: "spectator", es: "el espectador" },
+  { en: "act (theater)", es: "el acto" },
+  { en: "lights", es: "las luces" },
+  { en: "scene", es: "la escena" },
+  { en: "acting", es: "la actuación" },
+  { en: "sounds", es: "los sonidos" },
+  { en: "rehearsal", es: "el ensayo" },
+  { en: "tickets", es: "las entradas" },
+  { en: "premiere/opening night", es: "el estreno" },
+  { en: "role / part", es: "el papel" },
+  { en: "voice", es: "la voz" },
+  { en: "stage directions", es: "las acotaciones" },
+  { en: "set / scenery", es: "la escenografía" },
+  { en: "cast", es: "el elenco / el reparto" },
+  { en: "playwright", es: "el dramaturgo" },
+  { en: "still life", es: "la naturaleza muerta" },
+  { en: "portrait", es: "el retrato" },
+  { en: "self-portrait", es: "el autorretrato" },
+  { en: "painting (artwork)", es: "el cuadro" },
+  { en: "background", es: "el fondo" },
+  { en: "foreground", es: "el primer plano" },
+  { en: "architecture", es: "la arquitectura" },
+  { en: "ballet", es: "el ballet" },
+  { en: "concert", es: "el concierto" },
+  { en: "sculpture", es: "la escultura" },
+  { en: "photography", es: "la fotografía" },
+  { en: "work of art", es: "la obra de arte" },
+  { en: "play (theater)", es: "la obra de teatro" },
+  { en: "opera", es: "la ópera" },
+  { en: "painting (medium)", es: "la pintura" },
+  { en: "poetry", es: "la poesía" },
+  { en: "theater", es: "el teatro" },
+  { en: "artist", es: "el/la artista" },
+  { en: "author", es: "el/la autor(a)" },
+  { en: "painter", es: "el pintor" },
+  { en: "poet", es: "el poeta" },
+  { en: "sculptor", es: "el escultor" },
+
+  // ===== CIVICS =====
+  { en: "citizen", es: "el/la ciudadano(a)" },
+  { en: "duty", es: "el deber" },
+  { en: "democracy", es: "la democracia" },
+  { en: "dictator", es: "el/la dictador(a)" },
+  { en: "speech", es: "el discurso" },
+  { en: "army", es: "el ejército" },
+  { en: "armed forces", es: "las fuerzas armadas" },
+  { en: "law", es: "la ley" },
+  { en: "power", es: "el poder" },
+  { en: "politician", es: "el/la político(a)" },
+  { en: "corruption", es: "la corrupción" },
+  { en: "crime", es: "el crimen" },
+  { en: "civil rights", es: "los derechos civiles" },
+  { en: "human rights", es: "los derechos humanos" },
+  { en: "inequality", es: "la (des)igualdad" },
+  { en: "insecurity", es: "la (in)seguridad" },
+  { en: "vote", es: "el voto" },
+  { en: "campaign", es: "la campaña" },
+  { en: "candidate", es: "el/la candidato(a)" },
+  { en: "congress", es: "el congreso" },
+  { en: "debate", es: "el debate" },
+  { en: "elections", es: "las elecciones" },
+  { en: "opposition", es: "la oposición" },
+  { en: "political party", es: "el partido político" },
+  { en: "president", es: "el/la presidente(a)" },
+  { en: "the Senate", es: "el Senado" },
+  { en: "the House of Representatives", es: "la Cámara de Representantes" },
+  { en: "electoral college", es: "el colegio electoral" },
+  { en: "district", es: "el distrito" },
+  { en: "state", es: "el estado" },
+  { en: "popular vote", es: "el voto popular" },
+  { en: "ballot box", es: "las urnas" },
+  { en: "voting center", es: "centro de votación" },
+  { en: "to support", es: "apoyar" },
+  { en: "to approve / to pass", es: "aprobar" },
+  { en: "to defend", es: "defender" },
+  { en: "to argue / discuss", es: "discutir" },
+  { en: "to elect", es: "elegir" },
+  { en: "to govern", es: "gobernar" },
+  { en: "to vote", es: "votar" },
+
+  // ===== HEALTH =====
+  { en: "symptoms", es: "los síntomas" },
+  { en: "to examine", es: "examinar" },
+  { en: "allergy", es: "la alergia" },
+  { en: "aspirin", es: "la aspirina" },
+  { en: "medical exam", es: "el examen médico" },
+  { en: "patient", es: "el/la paciente" },
+  { en: "to cut oneself", es: "cortar(se)" },
+  { en: "to hurt oneself", es: "lastimar(se)" },
+  { en: "to hurt / ache", es: "doler" },
+  { en: "to get sick", es: "enfermarse" },
+  { en: "to be congested", es: "estar congestionado/a" },
+  { en: "to be sick", es: "estar enfermo/a" },
+  { en: "to sneeze", es: "estornudar" },
+  { en: "to gargle", es: "hacer gárgaras" },
+  { en: "to suffer from", es: "padecer de" },
+  { en: "to give a shot", es: "poner(le) una inyección" },
+  { en: "to draw blood", es: "sacar(le) sangre" },
+  { en: "to take temperature", es: "tomar(le) la temperatura" },
+  { en: "to breathe", es: "respirar" },
+  { en: "to have the chills", es: "tener escalofríos" },
+  { en: "to have a fever", es: "tener fiebre" },
+  { en: "to have the flu", es: "tener gripe" },
+  { en: "to feel dizzy", es: "tener mareos" },
+  { en: "to have a migraine", es: "tener migraña" },
+  { en: "to have a stuffy nose", es: "tener la nariz tapada" },
+  { en: "to feel nauseous", es: "tener náuseas" },
+  { en: "to have a cough", es: "tener tos" },
+  { en: "to have a cold", es: "tener un resfriado" },
+  { en: "to twist (ankle, etc.)", es: "torcerse" },
+  { en: "to break (a bone)", es: "romperse" },
+  { en: "cardiologist", es: "el/la cardiólogo/a" },
+  { en: "surgeon", es: "el/la cirujano" },
+  { en: "doctor’s office", es: "el consultorio (del médico)" },
+  { en: "dentist", es: "el/la dentista" },
+  { en: "nurse", es: "el/la enfermero/a" },
+  { en: "pharmacist", es: "el/la farmacéutico/a" },
+  { en: "doctor", es: "el/la médico/a" },
+  { en: "eye doctor", es: "el/la oculista" },
+  { en: "pill", es: "la pastilla" },
+  { en: "blood pressure", es: "la presión arterial" },
+  { en: "prescription", es: "la receta" },
+  { en: "health insurance", es: "el seguro médico" },
+  { en: "x-ray", es: "la placa" },
+  { en: "well-being", es: "el bienestar" },
+
+  // ===== TECHNOLOGY =====
+  { en: "off", es: "apagado/a" },
+  { en: "on", es: "encendido/a" },
+  { en: "plugged in", es: "enchufado/a" },
+  { en: "to freeze (device)", es: "colgarse" },
+  { en: "speakers", es: "el altavoz / los altavoces" },
+  { en: "device", es: "el aparato (eléctrico/electrónico)" },
+  { en: "headphones", es: "los audífonos / los auriculares" },
+  { en: "selfie", es: "una selfie (una autofoto)" },
+  { en: "digital camera", es: "la cámara (digital)" },
+  { en: "charger", es: "el cargador" },
+  { en: "remote control", es: "el control" },
+  { en: "e-book", es: "el libro electrónico" },
+  { en: "tablet", es: "la tableta" },
+  { en: "text message", es: "el mensaje de texto" },
+  { en: "voice message", es: "el mensaje de voz" },
+  { en: "batteries", es: "las baterías" },
+  { en: "GPS system", es: "el sistema GPS" },
+  { en: "smartphone", es: "el teléfono inteligente" },
+  { en: "cell phone", es: "el teléfono celular / el móvil" },
+  { en: "flat-screen TV", es: "el televisor (de pantalla plana)" },
+  { en: "digital video camera", es: "la videocámara digital" },
+  { en: "video game", es: "el videojuego" },
+  { en: "social networks", es: "las redes sociales" },
+  { en: "tweet", es: "el tuit" },
+  { en: "blog", es: "el blog" },
+  { en: "blogger", es: "el/la bloguero/a" },
+  { en: "laptop", es: "la computadora (portátil)" },
+  { en: "hard drive", es: "el disco duro" },
+  { en: "microphone", es: "el micrófono" },
+  { en: "monitor", es: "el monitor" },
+  { en: "touch screen", es: "la pantalla (táctil)" },
+  { en: "mouse", es: "el ratón" },
+  { en: "keyboard", es: "el teclado" },
+  { en: "to turn off", es: "apagar" },
+  { en: "to (dis)connect", es: "(des)conectar" },
+  { en: "to (un)plug", es: "(des)enchufar" },
+  { en: "to turn on", es: "encender" },
+  { en: "to (re)charge", es: "(re)cargar" },
+  { en: "to function / to work", es: "funcionar" },
+  { en: "to record", es: "grabar" },
+  { en: "to open a document/program", es: "abrir un documento (un programa)" },
+  { en: "to close a document/program", es: "cerrar un documento (un programa)" },
+  { en: "to save", es: "guardar" },
+  { en: "to be online", es: "estar en línea" },
+  { en: "to click", es: "hacer clic" },
+  { en: "to surf the net", es: "navegar en la red" },
+  { en: "to publish", es: "publicar" },
+  { en: "to tweet", es: "tuitear" },
+
+  // ===== GUSTAR / PRONOMINAL ESSENTIALS =====
+  { en: "to like (someone/something)", es: "caer bien (mal) a alguien" },
+  { en: "to gross out", es: "dar asco" },
+  { en: "to scare someone", es: "darle miedo a alguien" },
+  { en: "to hate something", es: "disgustar" },
+  { en: 'to "love" something', es: "encantar" },
+  { en: "to be fascinated by", es: "fascinar" },
+  { en: "to need / to be necessary", es: "hacer falta" },
+  { en: "to matter / to be important", es: "importar" },
+  { en: "to interest", es: "interesar" },
+  { en: "to bother", es: "molestar" },
+  { en: "to seem", es: "parecer" },
+
+  { en: "to leave", es: "irse" },
+  { en: "to stay", es: "quedarse" },
+  { en: "to resemble", es: "parecerse a" },
+  { en: "to become + adjective", es: "ponerse + adj." },
+  { en: "to get bored", es: "aburrirse" },
+  { en: "to become happy", es: "alegrarse" },
+  { en: "to get tired", es: "cansarse" },
+  { en: "to become confused", es: "confundirse" },
+  { en: "to become depressed", es: "deprimirse" },
+  { en: "to have fun", es: "divertirse" },
+  { en: "to become frustrated", es: "frustrarse" },
+  { en: "to become irritated", es: "irritarse" },
+  { en: "to get offended", es: "ofenderse" },
+  { en: "to become worried", es: "preocuparse" },
+  { en: "to feel", es: "sentirse" }
+];
+
+
+/* =========================
+   DECK SYSTEM
+   ========================= */
+
+const DECK_SIZE = 200;
+let deckIndex = parseInt(localStorage.getItem("deckIndex") || "0", 10);
+
+function getDeck() {
+  const start = deckIndex * DECK_SIZE;
+  return ALL_CARDS.slice(start, start + DECK_SIZE);
+}
+
+let flashcards = getDeck();
+
+/* =========================
+   STATE
+   ========================= */
+
+// IMPORTANT: English shows FIRST
+let showingSpanish = false;
+let index = 0;
+
+let hardCards = JSON.parse(localStorage.getItem("hardCards")) || [];
+
+/* =========================
+   ELEMENTS
+   ========================= */
+
+const wordEl = document.getElementById("word");
+const card = document.getElementById("card");
+
+/* =========================
+   FUNCTIONS
+   ========================= */
+
+function render() {
+  wordEl.textContent = showingSpanish
+    ? flashcards[index].es
+    : flashcards[index].en;
+}
+
+function flip() {
+  if (!showingSpanish) {
+    // English → Spanish
+    showingSpanish = true;
+  } else {
+    // Move to next card (back to English)
+    showingSpanish = false;
+    index = (index + 1) % flashcards.length;
+  }
+  render();
+}
+
+function markHard() {
+  const c = flashcards[index];
+  if (!hardCards.find(x => x.es === c.es)) {
+    hardCards.push(c);
+    localStorage.setItem("hardCards", JSON.stringify(hardCards));
+    alert(`Saved: ${c.en}`);
+  }
+}
+
+function loadDeck(newDeck) {
+  const maxDeck = Math.floor((ALL_CARDS.length - 1) / DECK_SIZE);
+  deckIndex = Math.max(0, Math.min(newDeck, maxDeck));
+  localStorage.setItem("deckIndex", deckIndex);
+  flashcards = getDeck();
+  index = 0;
+  showingSpanish = false;
+  render();
+}
+
+/* =========================
+   EVENTS
+   ========================= */
+
+card.addEventListener("click", flip);
+
+document.addEventListener("keydown", e => {
+  if (e.code === "Space") {
+    e.preventDefault();
+    flip();
+  }
+  if (e.key.toLowerCase() === "h") markHard();
+  if (e.key.toLowerCase() === "n") loadDeck(deckIndex + 1);
+  if (e.key.toLowerCase() === "p") loadDeck(deckIndex - 1);
+});
+
+/* =========================
+   START
+   ========================= */
+
+render();
+</script>
+
+</body>
+</html>
