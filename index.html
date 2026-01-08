@@ -1,338 +1,5 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Spanish Flashcards (Top 100)</title>
-
-  <style>
-    body {
-      margin: 0;
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background: #0b0b0b;
-      font-family: system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
-      color: #f3f3f3;
-    }
-
-    .wrap { width: min(92vw, 1100px); }
-
-    .card {
-      width: 100%;
-      height: min(55vh, 520px);
-      background: #141414;
-      border-radius: 28px;
-      box-shadow: 0 24px 60px rgba(0,0,0,0.45);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      cursor: pointer;
-      user-select: none;
-      border: 2px solid rgba(255,255,255,0.08);
-      padding: 28px;
-      position: relative;
-      box-sizing: border-box;
-    }
-
-    .word {
-      font-size: clamp(2.2rem, 5.5vw, 5.1rem);
-      font-weight: 750;
-      line-height: 1.08;
-    }
-
-    .sub {
-      margin-top: 14px;
-      font-size: 1rem;
-      opacity: 0.72;
-      text-align: center;
-    }
-
-    .badge {
-      position: absolute;
-      top: 16px;
-      right: 18px;
-      font-size: 0.95rem;
-      padding: 8px 12px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,0.14);
-      background: rgba(255,255,255,0.06);
-      opacity: 0.95;
-    }
-
-    .controls {
-      margin-top: 16px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      justify-content: center;
-    }
-
-    button, select {
-      background: #1f1f1f;
-      color: #f3f3f3;
-      border: 1px solid rgba(255,255,255,0.12);
-      border-radius: 14px;
-      padding: 12px 14px;
-      font-size: 1.0rem;
-      font-weight: 700;
-      cursor: pointer;
-      min-width: 160px;
-    }
-
-    select { cursor: pointer; }
-
-    button:active { transform: translateY(1px); }
-
-    .status {
-      margin-top: 10px;
-      font-size: 0.95rem;
-      opacity: 0.82;
-      text-align: center;
-      line-height: 1.35;
-    }
-
-    .tiny {
-      opacity: 0.68;
-      font-size: 0.88rem;
-      margin-top: 8px;
-      text-align: center;
-    }
-  </style>
-</head>
-
-<body>
-  <div class="wrap">
-    <div class="card" id="card" role="button" aria-label="Flashcard (click to flip)">
-      <div class="badge" id="badge">Loading…</div>
-      <div>
-        <div class="word" id="word">Loading…</div>
-        <div class="sub" id="sub">Tap “Enable Audio” once if speech is blocked.</div>
-      </div>
-    </div>
-
-    <div class="controls">
-      <button id="prevBtn">Prev (←)</button>
-      <button id="flipBtn">Flip (Space)</button>
-      <button id="nextBtn">Next (→)</button>
-
-      <button id="unknownBtn">Don’t know (U)</button>
-      <button id="reviewUnknownBtn">Review Unknown (R)</button>
-
-      <select id="startSideSel" title="Start side">
-        <option value="EN">Start EN → ES</option>
-        <option value="ES">Start ES → EN</option>
-      </select>
-
-      <button id="shuffleBtn">Shuffle: OFF</button>
-      <button id="reshuffleBtn">Reshuffle Now</button>
-
-      <button id="audioBtn">Enable Audio</button>
-      <button id="autoSpeakBtn">Auto Speak: ON</button>
-      <button id="clearUnknownBtn">Clear Unknown</button>
-    </div>
-
-    <div class="status" id="status"></div>
-    <div class="tiny">
-      Keys: Space=flip · ←/→ navigate · U=toggle unknown · R=unknown-only
-    </div>
-  </div>
-
-<script>
 /* =========================
-   TOP 100 CARDS (you can replace this list any time)
-   IMPORTANT: We will only use the first 100 entries.
-   ========================= */
-const ALL_CARDS_FULL = [
-  // --- Week 1 list (you can keep adding; app will take first 100) ---
-  { en: "to realize", es: "darse cuenta" },
-  { en: "to seem", es: "parecer" },
-  { en: "to mean", es: "significar" },
-  { en: "to depend on", es: "depender de" },
-  { en: "to explain", es: "explicar" },
-  { en: "to describe", es: "describir" },
-  { en: "to define", es: "definir" },
-  { en: "to interpret", es: "interpretar" },
-  { en: "to analyze", es: "analizar" },
-  { en: "to evaluate", es: "evaluar" },
-  { en: "to consider", es: "considerar" },
-  { en: "to suppose", es: "suponer" },
-  { en: "to assume", es: "asumir" },
-  { en: "to suggest", es: "sugerir" },
-  { en: "to propose", es: "proponer" },
-  { en: "to argue", es: "argumentar" },
-  { en: "to support (an idea)", es: "apoyar" },
-  { en: "to justify", es: "justificar" },
-  { en: "to demonstrate", es: "demostrar" },
-  { en: "to show", es: "mostrar" },
-  { en: "to point out", es: "señalar" },
-  { en: "to mention", es: "mencionar" },
-  { en: "to refer to", es: "referirse a" },
-  { en: "to conclude", es: "concluir" },
-  { en: "to summarize", es: "resumir" },
-  { en: "to compare", es: "comparar" },
-  { en: "to contrast", es: "contrastar" },
-  { en: "to emphasize", es: "enfatizar" },
-  { en: "to clarify", es: "aclarar" },
-  { en: "to affect", es: "afectar" },
-  { en: "to influence", es: "influir en" },
-  { en: "to improve", es: "mejorar" },
-  { en: "to worsen", es: "empeorar" },
-  { en: "to increase", es: "aumentar" },
-  { en: "to reduce", es: "reducir" },
-  { en: "to occur / to happen", es: "ocurrir" },
-  { en: "to exist", es: "existir" },
-  { en: "to achieve", es: "lograr" },
-  { en: "to fail", es: "fracasar" },
-  { en: "to succeed", es: "tener éxito" },
-  { en: "to require", es: "requerir" },
-  { en: "to allow", es: "permitir" },
-  { en: "to prevent", es: "impedir" },
-  { en: "to cause", es: "causar" },
-  { en: "to result in", es: "resultar en" },
-  { en: "to contribute", es: "contribuir" },
-  { en: "to protect", es: "proteger" },
-
-  { en: "society", es: "la sociedad" },
-  { en: "culture", es: "la cultura" },
-  { en: "identity", es: "la identidad" },
-  { en: "experience", es: "la experiencia" },
-  { en: "opinion", es: "la opinión" },
-  { en: "point of view", es: "el punto de vista" },
-  { en: "change", es: "el cambio" },
-  { en: "difference", es: "la diferencia" },
-  { en: "similarity", es: "la semejanza" },
-  { en: "effect", es: "el efecto" },
-  { en: "cause", es: "la causa" },
-  { en: "result", es: "el resultado" },
-  { en: "importance", es: "la importancia" },
-  { en: "development", es: "el desarrollo" },
-  { en: "context", es: "el contexto" },
-  { en: "process", es: "el proceso" },
-  { en: "level", es: "el nivel" },
-  { en: "system", es: "el sistema" },
-  { en: "relationship", es: "la relación" },
-  { en: "impact", es: "el impacto" },
-  { en: "issue / topic", es: "el tema" },
-  { en: "problem", es: "el problema" },
-  { en: "challenge", es: "el desafío" },
-  { en: "solution", es: "la solución" },
-  { en: "evidence", es: "la evidencia" },
-  { en: "research", es: "la investigación" },
-  { en: "analysis", es: "el análisis" },
-  { en: "perspective", es: "la perspectiva" },
-  { en: "conclusion", es: "la conclusión" },
-  { en: "argument", es: "el argumento" },
-  { en: "concept", es: "el concepto" },
-  { en: "value", es: "el valor" },
-  { en: "belief", es: "la creencia" },
-  { en: "habit", es: "el hábito" },
-  { en: "behavior", es: "el comportamiento" },
-  { en: "goal", es: "la meta" },
-  { en: "decision", es: "la decisión" },
-  { en: "consequence", es: "la consecuencia" },
-
-  { en: "therefore", es: "por lo tanto" },
-  { en: "however", es: "sin embargo" },
-  { en: "although", es: "aunque" },
-  { en: "despite", es: "a pesar de" },
-  { en: "due to", es: "debido a" },
-  { en: "in general", es: "en general" },
-  { en: "for example", es: "por ejemplo" },
-  { en: "in my opinion", es: "en mi opinión" },
-  { en: "on the other hand", es: "por otro lado" },
-  { en: "as a result", es: "como resultado" },
-  { en: "in contrast", es: "en contraste" },
-  { en: "in addition", es: "además" },
-  { en: "in fact", es: "de hecho" },
-  { en: "in other words", es: "en otras palabras" },
-  { en: "instead of", es: "en lugar de" },
-  { en: "in order to", es: "con el fin de" },
-  { en: "even if", es: "incluso si" },
-  { en: "nevertheless", es: "no obstante" },
-
-  { en: "necessary", es: "necesario/a" },
-  { en: "possible", es: "posible" },
-  { en: "likely", es: "probable" },
-  { en: "complex", es: "complejo/a" },
-  { en: "effective", es: "eficaz" },
-  { en: "relevant", es: "relevante" },
-  { en: "common", es: "común" },
-  { en: "significant", es: "significativo/a" },
-
-  { en: "currently", es: "actualmente" },
-  { en: "nowadays", es: "hoy en día" },
-  { en: "in the past", es: "en el pasado" },
-  { en: "in the future", es: "en el futuro" },
-  { en: "at the same time", es: "al mismo tiempo" },
-  { en: "over time", es: "con el tiempo" },
-  { en: "from my perspective", es: "desde mi perspectiva" },
-];
-
-// Keep ONLY first 100:
-const ALL_CARDS = ALL_CARDS_FULL.slice(0, 100);
-
-/* =========================
-   SETTINGS / STORAGE
-   ========================= */
-const LS_UNKNOWN = "unknownCards_top100_v1";
-const LS_REVIEW_UNKNOWN = "reviewUnknownOnly_top100_v1";
-const LS_START_SIDE = "startSide_top100_v1"; // "EN" or "ES"
-const LS_SHUFFLE = "shuffle_top100_v1"; // "1" or "0"
-const LS_AUTOSPEAK = "autospeak_top100_v1"; // "1" or "0"
-
-function cardKey(card) { return `${card.en}|||${card.es}`; }
-
-function loadSet(key) {
-  try { return new Set(JSON.parse(localStorage.getItem(key) || "[]")); }
-  catch { return new Set(); }
-}
-function saveSet(key, setObj) {
-  localStorage.setItem(key, JSON.stringify(Array.from(setObj)));
-}
-
-let unknownSet = loadSet(LS_UNKNOWN);
-let reviewUnknownOnly = (localStorage.getItem(LS_REVIEW_UNKNOWN) || "0") === "1";
-let startSide = localStorage.getItem(LS_START_SIDE) || "EN";
-let shuffleOn = (localStorage.getItem(LS_SHUFFLE) || "0") === "1";
-let autoSpeakOn = (localStorage.getItem(LS_AUTOSPEAK) || "1") === "1";
-
-let audioUnlocked = false;
-
-let showingSpanish = (startSide === "ES"); // show start side first
-let index = 0;
-
-// A working deck array (may be shuffled)
-let baseDeck = [...ALL_CARDS];
-let activeDeck = [];
-
-/* =========================
-   ELEMENTS
-   ========================= */
-const wordEl = document.getElementById("word");
-const subEl = document.getElementById("sub");
-const badgeEl = document.getElementById("badge");
-const statusEl = document.getElementById("status");
-
-const cardEl = document.getElementById("card");
-const prevBtn = document.getElementById("prevBtn");
-const flipBtn = document.getElementById("flipBtn");
-const nextBtn = document.getElementById("nextBtn");
-const unknownBtn = document.getElementById("unknownBtn");
-const reviewUnknownBtn = document.getElementById("reviewUnknownBtn");
-const clearUnknownBtn = document.getElementById("clearUnknownBtn");
-
-const startSideSel = document.getElementById("startSideSel");
-const shuffleBtn = document.getElementById("shuffleBtn");
-const reshuffleBtn = document.getElementById("reshuffleBtn");
-
-const audioBtn = document.getElementById("audioBtn");
-const autoSpeakBtn = document.getElementById("autoSpeakBtn");
-
-/* =========================
-   UTILS
+   SHUFFLE (FIXED): shuffle happens ONLY when you ask for it
    ========================= */
 function shuffleArray(arr) {
   const a = [...arr];
@@ -343,71 +10,93 @@ function shuffleArray(arr) {
   return a;
 }
 
-function rebuildDeck() {
-  baseDeck = [...ALL_CARDS];
-  if (shuffleOn) baseDeck = shuffleArray(baseDeck);
-  activeDeck = reviewUnknownOnly
-    ? baseDeck.filter(c => unknownSet.has(cardKey(c)))
-    : baseDeck;
+// Keep a persistent deck order so flip never changes the pairing
+let baseDeck = [...ALL_CARDS];   // (Top 100 already sliced)
+let deckOrder = [...baseDeck];   // this is what we display (may be shuffled)
+let activeDeck = [];             // filtered view (unknown-only)
 
-  // Keep index in range
+// Call this only when shuffle settings change
+function applyShuffleIfNeeded() {
+  deckOrder = shuffleOn ? shuffleArray(baseDeck) : [...baseDeck];
+}
+
+// Call this whenever unknown-only mode changes OR unknown set changes
+function applyFilter() {
+  activeDeck = reviewUnknownOnly
+    ? deckOrder.filter(c => unknownSet.has(cardKey(c)))
+    : [...deckOrder];
+
   if (index >= activeDeck.length) index = 0;
 }
 
-function currentCard() {
-  if (!activeDeck.length) return null;
-  return activeDeck[index];
+/* =========================
+   QUEST AUDIO: disable autospeak if TTS not supported
+   ========================= */
+function ttsSupported() {
+  try {
+    return ("speechSynthesis" in window) && ("SpeechSynthesisUtterance" in window);
+  } catch {
+    return false;
+  }
+}
+
+// If Quest/browser has no TTS, disable autospeak automatically
+if (!ttsSupported()) {
+  autoSpeakOn = false;
+  localStorage.setItem(LS_AUTOSPEAK, "0");
 }
 
 /* =========================
-   SPEECH
+   SPEECH (ONLY speaks current side; never changes card)
    ========================= */
 function speak(text, lang) {
   if (!autoSpeakOn) return;
   if (!audioUnlocked) return;
+  if (!ttsSupported()) return;
 
   try {
     window.speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(text);
     u.lang = lang;
     u.rate = 0.95;
-    u.pitch = 1.0;
     window.speechSynthesis.speak(u);
-  } catch {
-    // ignore
-  }
+  } catch {}
 }
 
 function speakCurrent() {
   const c = currentCard();
   if (!c) return;
   const text = showingSpanish ? c.es : c.en;
-  const lang = showingSpanish ? "es-ES" : "en-US";
-  speak(text, lang);
+  speak(text, showingSpanish ? "es-ES" : "en-US");
 }
 
 /* =========================
-   RENDER
+   RENDER (IMPORTANT: no reshuffle here)
    ========================= */
-function updateControlsUI() {
-  startSideSel.value = startSide;
-  shuffleBtn.textContent = `Shuffle: ${shuffleOn ? "ON" : "OFF"}`;
-  autoSpeakBtn.textContent = `Auto Speak: ${autoSpeakOn ? "ON" : "OFF"}`;
+function currentCard() {
+  if (!activeDeck.length) return null;
+  return activeDeck[index];
+}
+
+function updateStatus() {
+  statusEl.textContent =
+    `Top 100 · Card ${activeDeck.length ? (index + 1) : 0}/${activeDeck.length} · ` +
+    `Unknown: ${unknownSet.size} · Mode: ${reviewUnknownOnly ? "Unknown only" : "All"} · ` +
+    `Shuffle: ${shuffleOn ? "ON" : "OFF"} · ` +
+    `Audio: ${ttsSupported() ? (audioUnlocked ? "Unlocked" : "Tap Enable Audio") : "Not supported on this browser"}`;
 }
 
 function render() {
-  rebuildDeck();
-  updateControlsUI();
+  // only filter; do NOT reshuffle or rebuild order
+  applyFilter();
 
   if (!activeDeck.length) {
-    wordEl.textContent = reviewUnknownOnly
-      ? "No unknown cards (in Top 100)"
-      : "No cards";
+    wordEl.textContent = reviewUnknownOnly ? "No unknown cards" : "No cards";
     subEl.textContent = reviewUnknownOnly
-      ? "Press R to exit Unknown mode, or mark cards with U."
-      : "Check the list.";
-    badgeEl.textContent = reviewUnknownOnly ? "Unknown only" : `${startSide} start`;
-    statusEl.textContent = `Total cards: ${ALL_CARDS.length} · Unknown: ${unknownSet.size} · Mode: ${reviewUnknownOnly ? "Unknown only" : "All"} · Shuffle: ${shuffleOn ? "ON" : "OFF"}`;
+      ? "Press R to exit Unknown mode or mark cards with U."
+      : "";
+    badgeEl.textContent = reviewUnknownOnly ? "Unknown only" : "EN/ES";
+    updateStatus();
     return;
   }
 
@@ -418,28 +107,24 @@ function render() {
   subEl.textContent = showingSpanish ? "Spanish" : "English";
   badgeEl.textContent = isUnknown ? "UNKNOWN" : `${startSide} start`;
 
-  statusEl.textContent =
-    `Top 100 · Card ${index + 1}/${activeDeck.length} · ` +
-    `Unknown: ${unknownSet.size} · Mode: ${reviewUnknownOnly ? "Unknown only" : "All"} · ` +
-    `Shuffle: ${shuffleOn ? "ON" : "OFF"} · ` +
-    `Audio: ${audioUnlocked ? "Unlocked" : "Tap Enable Audio"}`;
+  updateStatus();
 
-  // Auto speak on render
+  // Auto speak the side that is currently showing
   speakCurrent();
 }
 
 /* =========================
-   ACTIONS
+   ACTIONS (never reshuffle inside flip/next/prev)
    ========================= */
 function flip() {
-  showingSpanish = !showingSpanish;
+  showingSpanish = !showingSpanish; // same card, other side
   render();
 }
 
 function nextCard() {
   if (!activeDeck.length) return;
   index = (index + 1) % activeDeck.length;
-  showingSpanish = (startSide === "ES"); // reset to start side each new card
+  showingSpanish = (startSide === "ES"); // reset to chosen start side
   render();
 }
 
@@ -450,109 +135,27 @@ function prevCard() {
   render();
 }
 
-function toggleUnknown() {
-  const c = currentCard();
-  if (!c) return;
-  const k = cardKey(c);
-  if (unknownSet.has(k)) unknownSet.delete(k);
-  else unknownSet.add(k);
-  saveSet(LS_UNKNOWN, unknownSet);
-  render();
-}
-
-function toggleReviewUnknown() {
-  reviewUnknownOnly = !reviewUnknownOnly;
-  localStorage.setItem(LS_REVIEW_UNKNOWN, reviewUnknownOnly ? "1" : "0");
-  index = 0;
-  showingSpanish = (startSide === "ES");
-  render();
-}
-
-function clearUnknown() {
-  if (!confirm("Clear ALL 'unknown' marks?")) return;
-  unknownSet = new Set();
-  saveSet(LS_UNKNOWN, unknownSet);
-  index = 0;
-  showingSpanish = (startSide === "ES");
-  render();
-}
-
 function toggleShuffle() {
   shuffleOn = !shuffleOn;
   localStorage.setItem(LS_SHUFFLE, shuffleOn ? "1" : "0");
   index = 0;
   showingSpanish = (startSide === "ES");
+  applyShuffleIfNeeded(); // shuffle ONCE here
   render();
 }
 
 function reshuffleNow() {
-  if (!shuffleOn) {
-    shuffleOn = true;
-    localStorage.setItem(LS_SHUFFLE, "1");
-  }
+  shuffleOn = true;
+  localStorage.setItem(LS_SHUFFLE, "1");
   index = 0;
   showingSpanish = (startSide === "ES");
-  // rebuildDeck will reshuffle
-  render();
-}
-
-function setStartSide(val) {
-  startSide = val;
-  localStorage.setItem(LS_START_SIDE, startSide);
-  index = 0;
-  showingSpanish = (startSide === "ES");
-  render();
-}
-
-function unlockAudio() {
-  // user gesture unlock
-  audioUnlocked = true;
-  // speak something immediately to confirm
-  speakCurrent();
-  render();
-}
-
-function toggleAutoSpeak() {
-  autoSpeakOn = !autoSpeakOn;
-  localStorage.setItem(LS_AUTOSPEAK, autoSpeakOn ? "1" : "0");
+  applyShuffleIfNeeded(); // shuffle ONCE here
   render();
 }
 
 /* =========================
-   EVENTS
+   INIT (do once)
    ========================= */
-cardEl.addEventListener("click", flip);
-flipBtn.addEventListener("click", flip);
-nextBtn.addEventListener("click", nextCard);
-prevBtn.addEventListener("click", prevCard);
-
-unknownBtn.addEventListener("click", toggleUnknown);
-reviewUnknownBtn.addEventListener("click", toggleReviewUnknown);
-clearUnknownBtn.addEventListener("click", clearUnknown);
-
-shuffleBtn.addEventListener("click", toggleShuffle);
-reshuffleBtn.addEventListener("click", reshuffleNow);
-
-startSideSel.addEventListener("change", (e) => setStartSide(e.target.value));
-
-audioBtn.addEventListener("click", unlockAudio);
-autoSpeakBtn.addEventListener("click", toggleAutoSpeak);
-
-document.addEventListener("keydown", (e) => {
-  if (e.code === "Space") { e.preventDefault(); flip(); }
-  if (e.key === "ArrowRight") nextCard();
-  if (e.key === "ArrowLeft") prevCard();
-  if (e.key.toLowerCase() === "u") toggleUnknown();
-  if (e.key.toLowerCase() === "r") toggleReviewUnknown();
-});
-
-/* =========================
-   START
-   ========================= */
+applyShuffleIfNeeded();
+applyFilter();
 render();
-</script>
-</body>
-</html>
-
-
-
