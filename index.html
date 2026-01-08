@@ -1,161 +1,254 @@
-/* =========================
-   SHUFFLE (FIXED): shuffle happens ONLY when you ask for it
-   ========================= */
-function shuffleArray(arr) {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spanish Flashcards</title>
+
+<style>
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: #0b0b0b;
+    color: #f3f3f3;
+    font-family: system-ui, -apple-system, Helvetica, Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
   }
-  return a;
-}
 
-// Keep a persistent deck order so flip never changes the pairing
-let baseDeck = [...ALL_CARDS];   // (Top 100 already sliced)
-let deckOrder = [...baseDeck];   // this is what we display (may be shuffled)
-let activeDeck = [];             // filtered view (unknown-only)
-
-// Call this only when shuffle settings change
-function applyShuffleIfNeeded() {
-  deckOrder = shuffleOn ? shuffleArray(baseDeck) : [...baseDeck];
-}
-
-// Call this whenever unknown-only mode changes OR unknown set changes
-function applyFilter() {
-  activeDeck = reviewUnknownOnly
-    ? deckOrder.filter(c => unknownSet.has(cardKey(c)))
-    : [...deckOrder];
-
-  if (index >= activeDeck.length) index = 0;
-}
-
-/* =========================
-   QUEST AUDIO: disable autospeak if TTS not supported
-   ========================= */
-function ttsSupported() {
-  try {
-    return ("speechSynthesis" in window) && ("SpeechSynthesisUtterance" in window);
-  } catch {
-    return false;
+  .card {
+    width: min(92vw, 900px);
+    height: min(55vh, 460px);
+    background: #141414;
+    border-radius: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    cursor: pointer;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.45);
+    padding: 32px;
   }
-}
 
-// If Quest/browser has no TTS, disable autospeak automatically
-if (!ttsSupported()) {
-  autoSpeakOn = false;
-  localStorage.setItem(LS_AUTOSPEAK, "0");
-}
+  .word {
+    font-size: clamp(2.4rem, 6vw, 5rem);
+    font-weight: 700;
+    line-height: 1.15;
+  }
+
+  .label {
+    margin-top: 12px;
+    font-size: 0.95rem;
+    opacity: 0.7;
+  }
+
+  .controls {
+    margin-top: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+  }
+
+  button {
+    background: #1f1f1f;
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 14px;
+    padding: 12px 18px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  button:hover { opacity: 0.9; }
+
+  .status {
+    margin-top: 14px;
+    font-size: 0.9rem;
+    opacity: 0.75;
+  }
+</style>
+</head>
+
+<body>
+
+<div class="card" id="card">
+  <div>
+    <div class="word" id="word"></div>
+    <div class="label" id="label"></div>
+  </div>
+</div>
+
+<div class="controls">
+  <button onclick="prevCard()">← Prev</button>
+  <button onclick="flipCard()">Flip</button>
+  <button onclick="nextCard()">Next →</button>
+  <button onclick="shuffleDeck()">Shuffle</button>
+  <button onclick="toggleStart()">Start: <span id="startSideLabel">EN</span></button>
+  <button onclick="toggleAudio()">Audio: <span id="audioLabel">ON</span></button>
+</div>
+
+<div class="status" id="status"></div>
+
+<script>
+/* =========================
+   VOCAB — FIRST 100 WORDS
+   ========================= */
+const CARDS = [
+  { en:"to realize", es:"darse cuenta" },
+  { en:"to seem", es:"parecer" },
+  { en:"to mean", es:"significar" },
+  { en:"to explain", es:"explicar" },
+  { en:"to describe", es:"describir" },
+  { en:"to consider", es:"considerar" },
+  { en:"to suppose", es:"suponer" },
+  { en:"to suggest", es:"sugerir" },
+  { en:"to argue", es:"argumentar" },
+  { en:"to affect", es:"afectar" },
+
+  { en:"society", es:"la sociedad" },
+  { en:"culture", es:"la cultura" },
+  { en:"experience", es:"la experiencia" },
+  { en:"opinion", es:"la opinión" },
+  { en:"point of view", es:"el punto de vista" },
+  { en:"change", es:"el cambio" },
+  { en:"difference", es:"la diferencia" },
+  { en:"cause", es:"la causa" },
+  { en:"effect", es:"el efecto" },
+  { en:"result", es:"el resultado" },
+
+  { en:"however", es:"sin embargo" },
+  { en:"therefore", es:"por lo tanto" },
+  { en:"although", es:"aunque" },
+  { en:"because of", es:"debido a" },
+  { en:"for example", es:"por ejemplo" },
+  { en:"in general", es:"en general" },
+  { en:"in my opinion", es:"en mi opinión" },
+  { en:"on the other hand", es:"por otro lado" },
+
+  { en:"necessary", es:"necesario/a" },
+  { en:"possible", es:"posible" },
+  { en:"important", es:"importante" },
+  { en:"common", es:"común" },
+  { en:"different", es:"diferente" },
+  { en:"similar", es:"similar" },
+  { en:"complex", es:"complejo/a" },
+  { en:"simple", es:"simple" },
+
+  { en:"to agree", es:"estar de acuerdo" },
+  { en:"to disagree", es:"estar en desacuerdo" },
+  { en:"to add", es:"añadir" },
+  { en:"to clarify", es:"aclarar" },
+  { en:"to conclude", es:"concluir" },
+  { en:"to summarize", es:"resumir" },
+  { en:"to analyze", es:"analizar" },
+  { en:"to compare", es:"comparar" },
+
+  { en:"currently", es:"actualmente" },
+  { en:"nowadays", es:"hoy en día" },
+  { en:"in the past", es:"en el pasado" },
+  { en:"in the future", es:"en el futuro" }
+];
 
 /* =========================
-   SPEECH (ONLY speaks current side; never changes card)
+   STATE
+   ========================= */
+let deck = [...CARDS];
+let index = 0;
+let showingSpanish = false;
+let startSide = "EN";
+let audioOn = true;
+
+/* =========================
+   ELEMENTS
+   ========================= */
+const wordEl = document.getElementById("word");
+const labelEl = document.getElementById("label");
+const statusEl = document.getElementById("status");
+const startSideLabel = document.getElementById("startSideLabel");
+const audioLabel = document.getElementById("audioLabel");
+
+/* =========================
+   AUDIO (SAFE)
    ========================= */
 function speak(text, lang) {
-  if (!autoSpeakOn) return;
-  if (!audioUnlocked) return;
-  if (!ttsSupported()) return;
+  if (!audioOn) return;
+  if (!("speechSynthesis" in window)) return;
 
-  try {
-    window.speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(text);
-    u.lang = lang;
-    u.rate = 0.95;
-    window.speechSynthesis.speak(u);
-  } catch {}
-}
-
-function speakCurrent() {
-  const c = currentCard();
-  if (!c) return;
-  const text = showingSpanish ? c.es : c.en;
-  speak(text, showingSpanish ? "es-ES" : "en-US");
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = lang;
+  u.rate = 0.95;
+  window.speechSynthesis.speak(u);
 }
 
 /* =========================
-   RENDER (IMPORTANT: no reshuffle here)
+   RENDER
    ========================= */
-function currentCard() {
-  if (!activeDeck.length) return null;
-  return activeDeck[index];
-}
-
-function updateStatus() {
-  statusEl.textContent =
-    `Top 100 · Card ${activeDeck.length ? (index + 1) : 0}/${activeDeck.length} · ` +
-    `Unknown: ${unknownSet.size} · Mode: ${reviewUnknownOnly ? "Unknown only" : "All"} · ` +
-    `Shuffle: ${shuffleOn ? "ON" : "OFF"} · ` +
-    `Audio: ${ttsSupported() ? (audioUnlocked ? "Unlocked" : "Tap Enable Audio") : "Not supported on this browser"}`;
-}
-
 function render() {
-  // only filter; do NOT reshuffle or rebuild order
-  applyFilter();
+  const c = deck[index];
+  const text = showingSpanish ? c.es : c.en;
+  const lang = showingSpanish ? "es-ES" : "en-US";
 
-  if (!activeDeck.length) {
-    wordEl.textContent = reviewUnknownOnly ? "No unknown cards" : "No cards";
-    subEl.textContent = reviewUnknownOnly
-      ? "Press R to exit Unknown mode or mark cards with U."
-      : "";
-    badgeEl.textContent = reviewUnknownOnly ? "Unknown only" : "EN/ES";
-    updateStatus();
-    return;
-  }
+  wordEl.textContent = text;
+  labelEl.textContent = showingSpanish ? "Spanish" : "English";
+  statusEl.textContent = `Card ${index + 1} / ${deck.length}`;
 
-  const c = currentCard();
-  const isUnknown = unknownSet.has(cardKey(c));
-
-  wordEl.textContent = showingSpanish ? c.es : c.en;
-  subEl.textContent = showingSpanish ? "Spanish" : "English";
-  badgeEl.textContent = isUnknown ? "UNKNOWN" : `${startSide} start`;
-
-  updateStatus();
-
-  // Auto speak the side that is currently showing
-  speakCurrent();
+  speak(text, lang);
 }
 
 /* =========================
-   ACTIONS (never reshuffle inside flip/next/prev)
+   ACTIONS
    ========================= */
-function flip() {
-  showingSpanish = !showingSpanish; // same card, other side
+function flipCard() {
+  showingSpanish = !showingSpanish;
   render();
 }
 
 function nextCard() {
-  if (!activeDeck.length) return;
-  index = (index + 1) % activeDeck.length;
-  showingSpanish = (startSide === "ES"); // reset to chosen start side
+  index = (index + 1) % deck.length;
+  showingSpanish = (startSide === "ES");
   render();
 }
 
 function prevCard() {
-  if (!activeDeck.length) return;
-  index = (index - 1 + activeDeck.length) % activeDeck.length;
+  index = (index - 1 + deck.length) % deck.length;
   showingSpanish = (startSide === "ES");
   render();
 }
 
-function toggleShuffle() {
-  shuffleOn = !shuffleOn;
-  localStorage.setItem(LS_SHUFFLE, shuffleOn ? "1" : "0");
+function shuffleDeck() {
+  for (let i = deck.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [deck[i], deck[j]] = [deck[j], deck[i]];
+  }
   index = 0;
   showingSpanish = (startSide === "ES");
-  applyShuffleIfNeeded(); // shuffle ONCE here
   render();
 }
 
-function reshuffleNow() {
-  shuffleOn = true;
-  localStorage.setItem(LS_SHUFFLE, "1");
-  index = 0;
+function toggleStart() {
+  startSide = (startSide === "EN") ? "ES" : "EN";
+  startSideLabel.textContent = startSide;
   showingSpanish = (startSide === "ES");
-  applyShuffleIfNeeded(); // shuffle ONCE here
   render();
+}
+
+function toggleAudio() {
+  audioOn = !audioOn;
+  audioLabel.textContent = audioOn ? "ON" : "OFF";
 }
 
 /* =========================
-   INIT (do once)
+   INIT
    ========================= */
-applyShuffleIfNeeded();
-applyFilter();
+startSideLabel.textContent = startSide;
+audioLabel.textContent = "ON";
 render();
+</script>
+
+</body>
+</html>
