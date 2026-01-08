@@ -3,14 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Spanish Flashcards (Week 1)</title>
+  <title>Spanish Flashcards (Top 100)</title>
 
   <style>
     body {
       margin: 0;
       height: 100vh;
       display: flex;
-      flex-direction: column;
       justify-content: center;
       align-items: center;
       background: #0b0b0b;
@@ -40,9 +39,8 @@
 
     .word {
       font-size: clamp(2.2rem, 5.5vw, 5.1rem);
-      font-weight: 700;
+      font-weight: 750;
       line-height: 1.08;
-      letter-spacing: 0.2px;
     }
 
     .sub {
@@ -65,50 +63,40 @@
     }
 
     .controls {
-      margin-top: 18px;
+      margin-top: 16px;
       display: flex;
       flex-wrap: wrap;
-      gap: 12px;
+      gap: 10px;
       justify-content: center;
     }
 
-    button {
+    button, select {
       background: #1f1f1f;
       color: #f3f3f3;
       border: 1px solid rgba(255,255,255,0.12);
       border-radius: 14px;
-      padding: 14px 18px;
-      font-size: 1.02rem;
+      padding: 12px 14px;
+      font-size: 1.0rem;
       font-weight: 700;
       cursor: pointer;
-      min-width: 170px;
+      min-width: 160px;
     }
+
+    select { cursor: pointer; }
 
     button:active { transform: translateY(1px); }
 
     .status {
-      margin-top: 12px;
+      margin-top: 10px;
       font-size: 0.95rem;
-      opacity: 0.8;
+      opacity: 0.82;
       text-align: center;
       line-height: 1.35;
     }
 
-    .errorBox {
-      margin-top: 14px;
-      padding: 12px 14px;
-      border-radius: 14px;
-      background: rgba(255, 70, 70, 0.12);
-      border: 1px solid rgba(255, 70, 70, 0.35);
-      color: rgba(255,255,255,0.95);
-      display: none;
-      white-space: pre-wrap;
-      font-size: 0.95rem;
-    }
-
     .tiny {
-      opacity: 0.7;
-      font-size: 0.9rem;
+      opacity: 0.68;
+      font-size: 0.88rem;
       margin-top: 8px;
       text-align: center;
     }
@@ -118,10 +106,10 @@
 <body>
   <div class="wrap">
     <div class="card" id="card" role="button" aria-label="Flashcard (click to flip)">
-      <div class="badge" id="badge">EN → ES</div>
+      <div class="badge" id="badge">Loading…</div>
       <div>
         <div class="word" id="word">Loading…</div>
-        <div class="sub" id="sub">If this stays stuck, tap “Reset App State”.</div>
+        <div class="sub" id="sub">Tap “Enable Audio” once if speech is blocked.</div>
       </div>
     </div>
 
@@ -129,38 +117,36 @@
       <button id="prevBtn">Prev (←)</button>
       <button id="flipBtn">Flip (Space)</button>
       <button id="nextBtn">Next (→)</button>
+
       <button id="unknownBtn">Don’t know (U)</button>
       <button id="reviewUnknownBtn">Review Unknown (R)</button>
+
+      <select id="startSideSel" title="Start side">
+        <option value="EN">Start EN → ES</option>
+        <option value="ES">Start ES → EN</option>
+      </select>
+
+      <button id="shuffleBtn">Shuffle: OFF</button>
+      <button id="reshuffleBtn">Reshuffle Now</button>
+
+      <button id="audioBtn">Enable Audio</button>
+      <button id="autoSpeakBtn">Auto Speak: ON</button>
       <button id="clearUnknownBtn">Clear Unknown</button>
-      <button id="resetBtn">Reset App State</button>
     </div>
 
     <div class="status" id="status"></div>
-    <div class="errorBox" id="errorBox"></div>
-    <div class="tiny">Keys: Space=flip · ←/→ navigate · U=toggle unknown · R=unknown-only · N/P deck</div>
+    <div class="tiny">
+      Keys: Space=flip · ←/→ navigate · U=toggle unknown · R=unknown-only
+    </div>
   </div>
 
 <script>
 /* =========================
-   SHOW ERRORS ON PAGE
+   TOP 100 CARDS (you can replace this list any time)
+   IMPORTANT: We will only use the first 100 entries.
    ========================= */
-(function () {
-  const errorBox = document.getElementById("errorBox");
-  window.addEventListener("error", (e) => {
-    errorBox.style.display = "block";
-    errorBox.textContent =
-      "JS ERROR:\n" +
-      (e.message || "Unknown error") +
-      "\n\n(Usually caused by a tiny typo in the vocab list.)";
-  });
-})();
-
-/* =========================
-   1) WEEK 1 VOCAB (EN → ES)
-   Big, high-yield, advanced-ready.
-   ========================= */
-const ALL_CARDS = [
-  // --- Academic / thinking verbs ---
+const ALL_CARDS_FULL = [
+  // --- Week 1 list (you can keep adding; app will take first 100) ---
   { en: "to realize", es: "darse cuenta" },
   { en: "to seem", es: "parecer" },
   { en: "to mean", es: "significar" },
@@ -209,7 +195,6 @@ const ALL_CARDS = [
   { en: "to contribute", es: "contribuir" },
   { en: "to protect", es: "proteger" },
 
-  // --- Abstract / academic nouns ---
   { en: "society", es: "la sociedad" },
   { en: "culture", es: "la cultura" },
   { en: "identity", es: "la identidad" },
@@ -239,7 +224,6 @@ const ALL_CARDS = [
   { en: "analysis", es: "el análisis" },
   { en: "perspective", es: "la perspectiva" },
   { en: "conclusion", es: "la conclusión" },
-  { en: "example", es: "el ejemplo" },
   { en: "argument", es: "el argumento" },
   { en: "concept", es: "el concepto" },
   { en: "value", es: "el valor" },
@@ -250,7 +234,6 @@ const ALL_CARDS = [
   { en: "decision", es: "la decisión" },
   { en: "consequence", es: "la consecuencia" },
 
-  // --- Logic connectors / discourse markers ---
   { en: "therefore", es: "por lo tanto" },
   { en: "however", es: "sin embargo" },
   { en: "although", es: "aunque" },
@@ -263,65 +246,22 @@ const ALL_CARDS = [
   { en: "as a result", es: "como resultado" },
   { en: "in contrast", es: "en contraste" },
   { en: "in addition", es: "además" },
-  { en: "furthermore", es: "además" },
   { en: "in fact", es: "de hecho" },
   { en: "in other words", es: "en otras palabras" },
   { en: "instead of", es: "en lugar de" },
   { en: "in order to", es: "con el fin de" },
-  { en: "as long as", es: "siempre que" },
   { en: "even if", es: "incluso si" },
   { en: "nevertheless", es: "no obstante" },
-  { en: "at least", es: "por lo menos" },
-  { en: "especially", es: "especialmente" },
-  { en: "for that reason", es: "por esa razón" },
 
-  // --- High-utility adjectives (academic) ---
   { en: "necessary", es: "necesario/a" },
   { en: "possible", es: "posible" },
   { en: "likely", es: "probable" },
   { en: "complex", es: "complejo/a" },
-  { en: "simple", es: "simple" },
   { en: "effective", es: "eficaz" },
   { en: "relevant", es: "relevante" },
   { en: "common", es: "común" },
-  { en: "current", es: "actual" },
   { en: "significant", es: "significativo/a" },
-  { en: "global", es: "global" },
-  { en: "individual", es: "individual" },
-  { en: "collective", es: "colectivo/a" },
-  { en: "political", es: "político/a" },
-  { en: "economic", es: "económico/a" },
-  { en: "social", es: "social" },
-  { en: "cultural", es: "cultural" },
-  { en: "basic", es: "básico/a" },
-  { en: "advanced", es: "avanzado/a" },
-  { en: "important", es: "importante" },
-  { en: "useful", es: "útil" },
-  { en: "harmful", es: "perjudicial" },
-  { en: "beneficial", es: "beneficioso/a" },
 
-  // --- Classroom / discussion essentials ---
-  { en: "to agree", es: "estar de acuerdo" },
-  { en: "to disagree", es: "estar en desacuerdo" },
-  { en: "to add", es: "añadir" },
-  { en: "to participate", es: "participar" },
-  { en: "to answer", es: "responder" },
-  { en: "to ask", es: "preguntar" },
-  { en: "to discuss", es: "discutir" },
-  { en: "to debate", es: "debatir" },
-  { en: "to present", es: "presentar" },
-  { en: "to explain (again)", es: "explicar de nuevo" },
-  { en: "to give an example", es: "dar un ejemplo" },
-  { en: "to quote", es: "citar" },
-  { en: "to read", es: "leer" },
-  { en: "to write", es: "escribir" },
-  { en: "to listen", es: "escuchar" },
-  { en: "to understand", es: "entender" },
-  { en: "to misunderstand", es: "malentender" },
-  { en: "to remember", es: "recordar" },
-  { en: "to forget", es: "olvidar" },
-
-  // --- Time / frequency ---
   { en: "currently", es: "actualmente" },
   { en: "nowadays", es: "hoy en día" },
   { en: "in the past", es: "en el pasado" },
@@ -329,90 +269,43 @@ const ALL_CARDS = [
   { en: "at the same time", es: "al mismo tiempo" },
   { en: "over time", es: "con el tiempo" },
   { en: "from my perspective", es: "desde mi perspectiva" },
-  { en: "often", es: "a menudo" },
-  { en: "sometimes", es: "a veces" },
-  { en: "rarely", es: "rara vez" },
-  { en: "always", es: "siempre" },
-  { en: "never", es: "nunca" },
-
-  // --- Media & current events (intermediate→advanced baseline) ---
-  { en: "news", es: "las noticias" },
-  { en: "media", es: "los medios" },
-  { en: "journalism", es: "el periodismo" },
-  { en: "article", es: "el artículo" },
-  { en: "report", es: "el reportaje" },
-  { en: "headline", es: "el titular" },
-  { en: "to report", es: "informar" },
-  { en: "to investigate", es: "investigar" },
-  { en: "to publish", es: "publicar" },
-  { en: "to censor", es: "censurar" },
-
-  // --- Social issues / civic words (advanced class staples) ---
-  { en: "rights", es: "los derechos" },
-  { en: "human rights", es: "los derechos humanos" },
-  { en: "equality", es: "la igualdad" },
-  { en: "inequality", es: "la desigualdad" },
-  { en: "justice", es: "la justicia" },
-  { en: "freedom", es: "la libertad" },
-  { en: "violence", es: "la violencia" },
-  { en: "poverty", es: "la pobreza" },
-  { en: "education", es: "la educación" },
-  { en: "health", es: "la salud" },
-  { en: "environment", es: "el medio ambiente" },
-  { en: "climate change", es: "el cambio climático" },
-  { en: "to reduce pollution", es: "reducir la contaminación" },
-  { en: "to recycle", es: "reciclar" },
-
-  // --- Useful “test writing” verbs ---
-  { en: "to claim", es: "afirmar" },
-  { en: "to deny", es: "negar" },
-  { en: "to admit", es: "admitir" },
-  { en: "to emphasize", es: "destacar" },
-  { en: "to point out", es: "señalar" },
-  { en: "to conclude", es: "concluir" }
 ];
 
-/* =========================
-   2) SETTINGS
-   ========================= */
-const DECK_SIZE = 200;
-
-// localStorage keys
-const LS_DECK = "deckIndex";
-const LS_UNKNOWN = "unknownCards_v2";
-const LS_REVIEW_UNKNOWN = "reviewUnknownOnly_v2";
+// Keep ONLY first 100:
+const ALL_CARDS = ALL_CARDS_FULL.slice(0, 100);
 
 /* =========================
-   HELPERS
+   SETTINGS / STORAGE
    ========================= */
+const LS_UNKNOWN = "unknownCards_top100_v1";
+const LS_REVIEW_UNKNOWN = "reviewUnknownOnly_top100_v1";
+const LS_START_SIDE = "startSide_top100_v1"; // "EN" or "ES"
+const LS_SHUFFLE = "shuffle_top100_v1"; // "1" or "0"
+const LS_AUTOSPEAK = "autospeak_top100_v1"; // "1" or "0"
+
 function cardKey(card) { return `${card.en}|||${card.es}`; }
 
-function loadUnknownSet() {
-  try { return new Set(JSON.parse(localStorage.getItem(LS_UNKNOWN) || "[]")); }
+function loadSet(key) {
+  try { return new Set(JSON.parse(localStorage.getItem(key) || "[]")); }
   catch { return new Set(); }
 }
-function saveUnknownSet(setObj) {
-  localStorage.setItem(LS_UNKNOWN, JSON.stringify(Array.from(setObj)));
-}
-function maxDeckIndex() {
-  return Math.max(0, Math.floor((ALL_CARDS.length - 1) / DECK_SIZE));
-}
-function getDeckSlice(deckIndex) {
-  const start = deckIndex * DECK_SIZE;
-  return ALL_CARDS.slice(start, start + DECK_SIZE);
+function saveSet(key, setObj) {
+  localStorage.setItem(key, JSON.stringify(Array.from(setObj)));
 }
 
-/* =========================
-   STATE
-   ========================= */
-let deckIndex = parseInt(localStorage.getItem(LS_DECK) || "0", 10);
-let unknownSet = loadUnknownSet();
+let unknownSet = loadSet(LS_UNKNOWN);
 let reviewUnknownOnly = (localStorage.getItem(LS_REVIEW_UNKNOWN) || "0") === "1";
+let startSide = localStorage.getItem(LS_START_SIDE) || "EN";
+let shuffleOn = (localStorage.getItem(LS_SHUFFLE) || "0") === "1";
+let autoSpeakOn = (localStorage.getItem(LS_AUTOSPEAK) || "1") === "1";
 
-let showingSpanish = false; // EN first
+let audioUnlocked = false;
+
+let showingSpanish = (startSide === "ES"); // show start side first
 let index = 0;
 
-let baseDeck = getDeckSlice(deckIndex);
+// A working deck array (may be shuffled)
+let baseDeck = [...ALL_CARDS];
 let activeDeck = [];
 
 /* =========================
@@ -420,24 +313,45 @@ let activeDeck = [];
    ========================= */
 const wordEl = document.getElementById("word");
 const subEl = document.getElementById("sub");
-const statusEl = document.getElementById("status");
 const badgeEl = document.getElementById("badge");
-const cardEl = document.getElementById("card");
+const statusEl = document.getElementById("status");
 
+const cardEl = document.getElementById("card");
 const prevBtn = document.getElementById("prevBtn");
 const flipBtn = document.getElementById("flipBtn");
 const nextBtn = document.getElementById("nextBtn");
 const unknownBtn = document.getElementById("unknownBtn");
 const reviewUnknownBtn = document.getElementById("reviewUnknownBtn");
 const clearUnknownBtn = document.getElementById("clearUnknownBtn");
-const resetBtn = document.getElementById("resetBtn");
+
+const startSideSel = document.getElementById("startSideSel");
+const shuffleBtn = document.getElementById("shuffleBtn");
+const reshuffleBtn = document.getElementById("reshuffleBtn");
+
+const audioBtn = document.getElementById("audioBtn");
+const autoSpeakBtn = document.getElementById("autoSpeakBtn");
 
 /* =========================
-   RENDER
+   UTILS
    ========================= */
-function getActiveDeck() {
-  if (!reviewUnknownOnly) return baseDeck;
-  return baseDeck.filter(c => unknownSet.has(cardKey(c)));
+function shuffleArray(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function rebuildDeck() {
+  baseDeck = [...ALL_CARDS];
+  if (shuffleOn) baseDeck = shuffleArray(baseDeck);
+  activeDeck = reviewUnknownOnly
+    ? baseDeck.filter(c => unknownSet.has(cardKey(c)))
+    : baseDeck;
+
+  // Keep index in range
+  if (index >= activeDeck.length) index = 0;
 }
 
 function currentCard() {
@@ -445,43 +359,73 @@ function currentCard() {
   return activeDeck[index];
 }
 
-function updateStatus() {
-  const totalDecks = maxDeckIndex() + 1;
-  const deckStart = deckIndex * DECK_SIZE + 1;
-  const deckEnd = Math.min((deckIndex + 1) * DECK_SIZE, ALL_CARDS.length);
-  const unknownCount = baseDeck.filter(c => unknownSet.has(cardKey(c))).length;
+/* =========================
+   SPEECH
+   ========================= */
+function speak(text, lang) {
+  if (!autoSpeakOn) return;
+  if (!audioUnlocked) return;
 
-  statusEl.textContent =
-    `Deck ${deckIndex + 1}/${totalDecks} · Card ${activeDeck.length ? (index + 1) : 0}/${activeDeck.length} · ` +
-    `${reviewUnknownOnly ? "MODE: Unknown only" : "MODE: All cards"} · ` +
-    `Unknown in this deck: ${unknownCount} · Words ${deckStart}-${deckEnd} · Total cards: ${ALL_CARDS.length}`;
+  try {
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = lang;
+    u.rate = 0.95;
+    u.pitch = 1.0;
+    window.speechSynthesis.speak(u);
+  } catch {
+    // ignore
+  }
+}
+
+function speakCurrent() {
+  const c = currentCard();
+  if (!c) return;
+  const text = showingSpanish ? c.es : c.en;
+  const lang = showingSpanish ? "es-ES" : "en-US";
+  speak(text, lang);
+}
+
+/* =========================
+   RENDER
+   ========================= */
+function updateControlsUI() {
+  startSideSel.value = startSide;
+  shuffleBtn.textContent = `Shuffle: ${shuffleOn ? "ON" : "OFF"}`;
+  autoSpeakBtn.textContent = `Auto Speak: ${autoSpeakOn ? "ON" : "OFF"}`;
 }
 
 function render() {
-  baseDeck = getDeckSlice(deckIndex);
-  activeDeck = getActiveDeck();
+  rebuildDeck();
+  updateControlsUI();
 
   if (!activeDeck.length) {
     wordEl.textContent = reviewUnknownOnly
-      ? "No unknown cards in this deck"
-      : "No cards in this deck";
+      ? "No unknown cards (in Top 100)"
+      : "No cards";
     subEl.textContent = reviewUnknownOnly
-      ? "Press R to exit Unknown mode, or mark some cards as unknown (U)."
-      : "Check your ALL_CARDS list.";
-    badgeEl.textContent = reviewUnknownOnly ? "Unknown only" : "EN → ES";
-    updateStatus();
+      ? "Press R to exit Unknown mode, or mark cards with U."
+      : "Check the list.";
+    badgeEl.textContent = reviewUnknownOnly ? "Unknown only" : `${startSide} start`;
+    statusEl.textContent = `Total cards: ${ALL_CARDS.length} · Unknown: ${unknownSet.size} · Mode: ${reviewUnknownOnly ? "Unknown only" : "All"} · Shuffle: ${shuffleOn ? "ON" : "OFF"}`;
     return;
   }
 
-  index = Math.max(0, Math.min(index, activeDeck.length - 1));
   const c = currentCard();
   const isUnknown = unknownSet.has(cardKey(c));
 
   wordEl.textContent = showingSpanish ? c.es : c.en;
   subEl.textContent = showingSpanish ? "Spanish" : "English";
-  badgeEl.textContent = isUnknown ? "UNKNOWN" : (reviewUnknownOnly ? "Unknown only" : "EN → ES");
+  badgeEl.textContent = isUnknown ? "UNKNOWN" : `${startSide} start`;
 
-  updateStatus();
+  statusEl.textContent =
+    `Top 100 · Card ${index + 1}/${activeDeck.length} · ` +
+    `Unknown: ${unknownSet.size} · Mode: ${reviewUnknownOnly ? "Unknown only" : "All"} · ` +
+    `Shuffle: ${shuffleOn ? "ON" : "OFF"} · ` +
+    `Audio: ${audioUnlocked ? "Unlocked" : "Tap Enable Audio"}`;
+
+  // Auto speak on render
+  speakCurrent();
 }
 
 /* =========================
@@ -491,59 +435,86 @@ function flip() {
   showingSpanish = !showingSpanish;
   render();
 }
+
 function nextCard() {
   if (!activeDeck.length) return;
   index = (index + 1) % activeDeck.length;
-  showingSpanish = false;
+  showingSpanish = (startSide === "ES"); // reset to start side each new card
   render();
 }
+
 function prevCard() {
   if (!activeDeck.length) return;
   index = (index - 1 + activeDeck.length) % activeDeck.length;
-  showingSpanish = false;
+  showingSpanish = (startSide === "ES");
   render();
 }
+
 function toggleUnknown() {
   const c = currentCard();
   if (!c) return;
   const k = cardKey(c);
   if (unknownSet.has(k)) unknownSet.delete(k);
   else unknownSet.add(k);
-  saveUnknownSet(unknownSet);
+  saveSet(LS_UNKNOWN, unknownSet);
   render();
 }
-function toggleReviewUnknownOnly() {
+
+function toggleReviewUnknown() {
   reviewUnknownOnly = !reviewUnknownOnly;
   localStorage.setItem(LS_REVIEW_UNKNOWN, reviewUnknownOnly ? "1" : "0");
   index = 0;
-  showingSpanish = false;
+  showingSpanish = (startSide === "ES");
   render();
 }
+
 function clearUnknown() {
   if (!confirm("Clear ALL 'unknown' marks?")) return;
   unknownSet = new Set();
-  saveUnknownSet(unknownSet);
+  saveSet(LS_UNKNOWN, unknownSet);
   index = 0;
-  showingSpanish = false;
+  showingSpanish = (startSide === "ES");
   render();
 }
-function loadDeck(newDeckIndex) {
-  deckIndex = Math.max(0, Math.min(newDeckIndex, maxDeckIndex()));
-  localStorage.setItem(LS_DECK, String(deckIndex));
+
+function toggleShuffle() {
+  shuffleOn = !shuffleOn;
+  localStorage.setItem(LS_SHUFFLE, shuffleOn ? "1" : "0");
   index = 0;
-  showingSpanish = false;
+  showingSpanish = (startSide === "ES");
   render();
 }
-function resetAppState() {
-  if (!confirm("Reset app state (unknown marks + mode + deck)?")) return;
-  localStorage.removeItem(LS_UNKNOWN);
-  localStorage.removeItem(LS_REVIEW_UNKNOWN);
-  localStorage.removeItem(LS_DECK);
-  unknownSet = new Set();
-  reviewUnknownOnly = false;
-  deckIndex = 0;
+
+function reshuffleNow() {
+  if (!shuffleOn) {
+    shuffleOn = true;
+    localStorage.setItem(LS_SHUFFLE, "1");
+  }
   index = 0;
-  showingSpanish = false;
+  showingSpanish = (startSide === "ES");
+  // rebuildDeck will reshuffle
+  render();
+}
+
+function setStartSide(val) {
+  startSide = val;
+  localStorage.setItem(LS_START_SIDE, startSide);
+  index = 0;
+  showingSpanish = (startSide === "ES");
+  render();
+}
+
+function unlockAudio() {
+  // user gesture unlock
+  audioUnlocked = true;
+  // speak something immediately to confirm
+  speakCurrent();
+  render();
+}
+
+function toggleAutoSpeak() {
+  autoSpeakOn = !autoSpeakOn;
+  localStorage.setItem(LS_AUTOSPEAK, autoSpeakOn ? "1" : "0");
   render();
 }
 
@@ -554,19 +525,25 @@ cardEl.addEventListener("click", flip);
 flipBtn.addEventListener("click", flip);
 nextBtn.addEventListener("click", nextCard);
 prevBtn.addEventListener("click", prevCard);
+
 unknownBtn.addEventListener("click", toggleUnknown);
-reviewUnknownBtn.addEventListener("click", toggleReviewUnknownOnly);
+reviewUnknownBtn.addEventListener("click", toggleReviewUnknown);
 clearUnknownBtn.addEventListener("click", clearUnknown);
-resetBtn.addEventListener("click", resetAppState);
+
+shuffleBtn.addEventListener("click", toggleShuffle);
+reshuffleBtn.addEventListener("click", reshuffleNow);
+
+startSideSel.addEventListener("change", (e) => setStartSide(e.target.value));
+
+audioBtn.addEventListener("click", unlockAudio);
+autoSpeakBtn.addEventListener("click", toggleAutoSpeak);
 
 document.addEventListener("keydown", (e) => {
   if (e.code === "Space") { e.preventDefault(); flip(); }
   if (e.key === "ArrowRight") nextCard();
   if (e.key === "ArrowLeft") prevCard();
   if (e.key.toLowerCase() === "u") toggleUnknown();
-  if (e.key.toLowerCase() === "r") toggleReviewUnknownOnly();
-  if (e.key.toLowerCase() === "n") loadDeck(deckIndex + 1);
-  if (e.key.toLowerCase() === "p") loadDeck(deckIndex - 1);
+  if (e.key.toLowerCase() === "r") toggleReviewUnknown();
 });
 
 /* =========================
@@ -576,5 +553,6 @@ render();
 </script>
 </body>
 </html>
+
 
 
