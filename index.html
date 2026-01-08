@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Spanish Flashcards</title>
+  <title>Spanish Flashcards (Week 1)</title>
 
   <style>
     body {
@@ -18,8 +18,10 @@
       color: #f3f3f3;
     }
 
+    .wrap { width: min(92vw, 1100px); }
+
     .card {
-      width: min(92vw, 1100px);
+      width: 100%;
       height: min(55vh, 520px);
       background: #141414;
       border-radius: 28px;
@@ -33,18 +35,20 @@
       border: 2px solid rgba(255,255,255,0.08);
       padding: 28px;
       position: relative;
+      box-sizing: border-box;
     }
 
     .word {
-      font-size: clamp(2.6rem, 6vw, 5.4rem);
-      font-weight: 650;
-      line-height: 1.1;
+      font-size: clamp(2.2rem, 5.5vw, 5.1rem);
+      font-weight: 700;
+      line-height: 1.08;
+      letter-spacing: 0.2px;
     }
 
     .sub {
       margin-top: 14px;
       font-size: 1rem;
-      opacity: 0.7;
+      opacity: 0.72;
       text-align: center;
     }
 
@@ -57,7 +61,7 @@
       border-radius: 999px;
       border: 1px solid rgba(255,255,255,0.14);
       background: rgba(255,255,255,0.06);
-      opacity: 0.9;
+      opacity: 0.95;
     }
 
     .controls {
@@ -74,8 +78,8 @@
       border: 1px solid rgba(255,255,255,0.12);
       border-radius: 14px;
       padding: 14px 18px;
-      font-size: 1.05rem;
-      font-weight: 650;
+      font-size: 1.02rem;
+      font-weight: 700;
       cursor: pointer;
       min-width: 170px;
     }
@@ -85,59 +89,114 @@
     .status {
       margin-top: 12px;
       font-size: 0.95rem;
-      opacity: 0.75;
+      opacity: 0.8;
       text-align: center;
-      max-width: min(92vw, 1100px);
+      line-height: 1.35;
+    }
+
+    .errorBox {
+      margin-top: 14px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: rgba(255, 70, 70, 0.12);
+      border: 1px solid rgba(255, 70, 70, 0.35);
+      color: rgba(255,255,255,0.95);
+      display: none;
+      white-space: pre-wrap;
+      font-size: 0.95rem;
+    }
+
+    .tiny {
+      opacity: 0.7;
+      font-size: 0.9rem;
+      margin-top: 8px;
+      text-align: center;
     }
   </style>
 </head>
 
 <body>
-  <div class="card" id="card" role="button" aria-label="Flashcard (click to flip)">
-    <div class="badge" id="badge">EN → ES</div>
-    <div>
-      <div class="word" id="word"></div>
-      <div class="sub" id="sub"></div>
+  <div class="wrap">
+    <div class="card" id="card" role="button" aria-label="Flashcard (click to flip)">
+      <div class="badge" id="badge">EN → ES</div>
+      <div>
+        <div class="word" id="word">Loading…</div>
+        <div class="sub" id="sub">If this stays stuck, tap “Reset App State”.</div>
+      </div>
     </div>
-  </div>
 
-  <div class="controls">
-    <button id="prevBtn">Prev (←)</button>
-    <button id="flipBtn">Flip (Space)</button>
-    <button id="nextBtn">Next (→)</button>
-    <button id="unknownBtn">Don’t know (U)</button>
-    <button id="reviewUnknownBtn">Review Unknown (R)</button>
-    <button id="clearUnknownBtn">Clear Unknown</button>
-  </div>
+    <div class="controls">
+      <button id="prevBtn">Prev (←)</button>
+      <button id="flipBtn">Flip (Space)</button>
+      <button id="nextBtn">Next (→)</button>
+      <button id="unknownBtn">Don’t know (U)</button>
+      <button id="reviewUnknownBtn">Review Unknown (R)</button>
+      <button id="clearUnknownBtn">Clear Unknown</button>
+      <button id="resetBtn">Reset App State</button>
+    </div>
 
-  <div class="status" id="status"></div>
+    <div class="status" id="status"></div>
+    <div class="errorBox" id="errorBox"></div>
+    <div class="tiny">Keys: Space=flip · ←/→ navigate · U=toggle unknown · R=unknown-only · N/P deck</div>
+  </div>
 
 <script>
 /* =========================
-   1) PASTE YOUR VOCAB HERE
-   Use { en: "...", es: "..." }
+   SHOW ERRORS ON PAGE
+   ========================= */
+(function () {
+  const errorBox = document.getElementById("errorBox");
+  window.addEventListener("error", (e) => {
+    errorBox.style.display = "block";
+    errorBox.textContent =
+      "JS ERROR:\n" +
+      (e.message || "Unknown error") +
+      "\n\n(Usually caused by a tiny typo in the vocab list.)";
+  });
+})();
+
+/* =========================
+   1) WEEK 1 VOCAB (EN → ES)
+   Big, high-yield, advanced-ready.
    ========================= */
 const ALL_CARDS = [
-
-  // ===== CORE ACADEMIC / THINKING VERBS =====
+  // --- Academic / thinking verbs ---
   { en: "to realize", es: "darse cuenta" },
   { en: "to seem", es: "parecer" },
   { en: "to mean", es: "significar" },
-  { en: "to depend (on)", es: "depender de" },
+  { en: "to depend on", es: "depender de" },
   { en: "to explain", es: "explicar" },
   { en: "to describe", es: "describir" },
+  { en: "to define", es: "definir" },
+  { en: "to interpret", es: "interpretar" },
+  { en: "to analyze", es: "analizar" },
+  { en: "to evaluate", es: "evaluar" },
   { en: "to consider", es: "considerar" },
   { en: "to suppose", es: "suponer" },
+  { en: "to assume", es: "asumir" },
   { en: "to suggest", es: "sugerir" },
+  { en: "to propose", es: "proponer" },
   { en: "to argue", es: "argumentar" },
   { en: "to support (an idea)", es: "apoyar" },
+  { en: "to justify", es: "justificar" },
+  { en: "to demonstrate", es: "demostrar" },
+  { en: "to show", es: "mostrar" },
+  { en: "to point out", es: "señalar" },
+  { en: "to mention", es: "mencionar" },
+  { en: "to refer to", es: "referirse a" },
+  { en: "to conclude", es: "concluir" },
+  { en: "to summarize", es: "resumir" },
+  { en: "to compare", es: "comparar" },
+  { en: "to contrast", es: "contrastar" },
+  { en: "to emphasize", es: "enfatizar" },
+  { en: "to clarify", es: "aclarar" },
   { en: "to affect", es: "afectar" },
   { en: "to influence", es: "influir en" },
   { en: "to improve", es: "mejorar" },
   { en: "to worsen", es: "empeorar" },
   { en: "to increase", es: "aumentar" },
   { en: "to reduce", es: "reducir" },
-  { en: "to occur / happen", es: "ocurrir" },
+  { en: "to occur / to happen", es: "ocurrir" },
   { en: "to exist", es: "existir" },
   { en: "to achieve", es: "lograr" },
   { en: "to fail", es: "fracasar" },
@@ -147,10 +206,13 @@ const ALL_CARDS = [
   { en: "to prevent", es: "impedir" },
   { en: "to cause", es: "causar" },
   { en: "to result in", es: "resultar en" },
+  { en: "to contribute", es: "contribuir" },
+  { en: "to protect", es: "proteger" },
 
-  // ===== ABSTRACT / ACADEMIC NOUNS =====
+  // --- Abstract / academic nouns ---
   { en: "society", es: "la sociedad" },
   { en: "culture", es: "la cultura" },
+  { en: "identity", es: "la identidad" },
   { en: "experience", es: "la experiencia" },
   { en: "opinion", es: "la opinión" },
   { en: "point of view", es: "el punto de vista" },
@@ -168,15 +230,27 @@ const ALL_CARDS = [
   { en: "system", es: "el sistema" },
   { en: "relationship", es: "la relación" },
   { en: "impact", es: "el impacto" },
-  { en: "issue", es: "el tema / el problema" },
+  { en: "issue / topic", es: "el tema" },
+  { en: "problem", es: "el problema" },
   { en: "challenge", es: "el desafío" },
   { en: "solution", es: "la solución" },
   { en: "evidence", es: "la evidencia" },
   { en: "research", es: "la investigación" },
   { en: "analysis", es: "el análisis" },
   { en: "perspective", es: "la perspectiva" },
+  { en: "conclusion", es: "la conclusión" },
+  { en: "example", es: "el ejemplo" },
+  { en: "argument", es: "el argumento" },
+  { en: "concept", es: "el concepto" },
+  { en: "value", es: "el valor" },
+  { en: "belief", es: "la creencia" },
+  { en: "habit", es: "el hábito" },
+  { en: "behavior", es: "el comportamiento" },
+  { en: "goal", es: "la meta" },
+  { en: "decision", es: "la decisión" },
+  { en: "consequence", es: "la consecuencia" },
 
-  // ===== CONNECTORS & LOGIC (CRITICAL) =====
+  // --- Logic connectors / discourse markers ---
   { en: "therefore", es: "por lo tanto" },
   { en: "however", es: "sin embargo" },
   { en: "although", es: "aunque" },
@@ -189,12 +263,19 @@ const ALL_CARDS = [
   { en: "as a result", es: "como resultado" },
   { en: "in contrast", es: "en contraste" },
   { en: "in addition", es: "además" },
+  { en: "furthermore", es: "además" },
+  { en: "in fact", es: "de hecho" },
+  { en: "in other words", es: "en otras palabras" },
   { en: "instead of", es: "en lugar de" },
   { en: "in order to", es: "con el fin de" },
   { en: "as long as", es: "siempre que" },
   { en: "even if", es: "incluso si" },
+  { en: "nevertheless", es: "no obstante" },
+  { en: "at least", es: "por lo menos" },
+  { en: "especially", es: "especialmente" },
+  { en: "for that reason", es: "por esa razón" },
 
-  // ===== HIGH-UTILITY ADJECTIVES =====
+  // --- High-utility adjectives (academic) ---
   { en: "necessary", es: "necesario/a" },
   { en: "possible", es: "posible" },
   { en: "likely", es: "probable" },
@@ -212,121 +293,153 @@ const ALL_CARDS = [
   { en: "economic", es: "económico/a" },
   { en: "social", es: "social" },
   { en: "cultural", es: "cultural" },
+  { en: "basic", es: "básico/a" },
+  { en: "advanced", es: "avanzado/a" },
+  { en: "important", es: "importante" },
+  { en: "useful", es: "útil" },
+  { en: "harmful", es: "perjudicial" },
+  { en: "beneficial", es: "beneficioso/a" },
 
-  // ===== CLASSROOM / EXPRESSION =====
+  // --- Classroom / discussion essentials ---
   { en: "to agree", es: "estar de acuerdo" },
   { en: "to disagree", es: "estar en desacuerdo" },
   { en: "to add", es: "añadir" },
-  { en: "to clarify", es: "aclarar" },
-  { en: "to emphasize", es: "enfatizar" },
-  { en: "to mention", es: "mencionar" },
-  { en: "to refer to", es: "referirse a" },
-  { en: "to conclude", es: "concluir" },
-  { en: "to summarize", es: "resumir" },
-  { en: "to analyze", es: "analizar" },
-  { en: "to interpret", es: "interpretar" },
-  { en: "to compare", es: "comparar" },
-  { en: "to contrast", es: "contrastar" },
+  { en: "to participate", es: "participar" },
+  { en: "to answer", es: "responder" },
+  { en: "to ask", es: "preguntar" },
+  { en: "to discuss", es: "discutir" },
+  { en: "to debate", es: "debatir" },
+  { en: "to present", es: "presentar" },
+  { en: "to explain (again)", es: "explicar de nuevo" },
+  { en: "to give an example", es: "dar un ejemplo" },
+  { en: "to quote", es: "citar" },
+  { en: "to read", es: "leer" },
+  { en: "to write", es: "escribir" },
+  { en: "to listen", es: "escuchar" },
+  { en: "to understand", es: "entender" },
+  { en: "to misunderstand", es: "malentender" },
+  { en: "to remember", es: "recordar" },
+  { en: "to forget", es: "olvidar" },
 
-  // ===== TIME / ABSTRACT TIME PHRASES =====
+  // --- Time / frequency ---
   { en: "currently", es: "actualmente" },
   { en: "nowadays", es: "hoy en día" },
   { en: "in the past", es: "en el pasado" },
   { en: "in the future", es: "en el futuro" },
   { en: "at the same time", es: "al mismo tiempo" },
   { en: "over time", es: "con el tiempo" },
-  { en: "from my perspective", es: "desde mi perspectiva" }
+  { en: "from my perspective", es: "desde mi perspectiva" },
+  { en: "often", es: "a menudo" },
+  { en: "sometimes", es: "a veces" },
+  { en: "rarely", es: "rara vez" },
+  { en: "always", es: "siempre" },
+  { en: "never", es: "nunca" },
+
+  // --- Media & current events (intermediate→advanced baseline) ---
+  { en: "news", es: "las noticias" },
+  { en: "media", es: "los medios" },
+  { en: "journalism", es: "el periodismo" },
+  { en: "article", es: "el artículo" },
+  { en: "report", es: "el reportaje" },
+  { en: "headline", es: "el titular" },
+  { en: "to report", es: "informar" },
+  { en: "to investigate", es: "investigar" },
+  { en: "to publish", es: "publicar" },
+  { en: "to censor", es: "censurar" },
+
+  // --- Social issues / civic words (advanced class staples) ---
+  { en: "rights", es: "los derechos" },
+  { en: "human rights", es: "los derechos humanos" },
+  { en: "equality", es: "la igualdad" },
+  { en: "inequality", es: "la desigualdad" },
+  { en: "justice", es: "la justicia" },
+  { en: "freedom", es: "la libertad" },
+  { en: "violence", es: "la violencia" },
+  { en: "poverty", es: "la pobreza" },
+  { en: "education", es: "la educación" },
+  { en: "health", es: "la salud" },
+  { en: "environment", es: "el medio ambiente" },
+  { en: "climate change", es: "el cambio climático" },
+  { en: "to reduce pollution", es: "reducir la contaminación" },
+  { en: "to recycle", es: "reciclar" },
+
+  // --- Useful “test writing” verbs ---
+  { en: "to claim", es: "afirmar" },
+  { en: "to deny", es: "negar" },
+  { en: "to admit", es: "admitir" },
+  { en: "to emphasize", es: "destacar" },
+  { en: "to point out", es: "señalar" },
+  { en: "to conclude", es: "concluir" }
 ];
-
-/* =========================
-   DECK SYSTEM
-   ========================= */
-
 
 /* =========================
    2) SETTINGS
    ========================= */
 const DECK_SIZE = 200;
 
-/* =========================
-   3) STORAGE KEYS
-   ========================= */
+// localStorage keys
 const LS_DECK = "deckIndex";
-const LS_UNKNOWN = "unknownCards_v1"; // stores array of keys
-const LS_REVIEW_UNKNOWN = "reviewUnknownOnly";
+const LS_UNKNOWN = "unknownCards_v2";
+const LS_REVIEW_UNKNOWN = "reviewUnknownOnly_v2";
 
 /* =========================
-   4) HELPERS
+   HELPERS
    ========================= */
-function cardKey(card) {
-  // Stable ID: English + Spanish (handles duplicates better than using only one side)
-  return `${card.en}|||${card.es}`;
-}
+function cardKey(card) { return `${card.en}|||${card.es}`; }
 
 function loadUnknownSet() {
-  try {
-    const arr = JSON.parse(localStorage.getItem(LS_UNKNOWN) || "[]");
-    return new Set(arr);
-  } catch {
-    return new Set();
-  }
+  try { return new Set(JSON.parse(localStorage.getItem(LS_UNKNOWN) || "[]")); }
+  catch { return new Set(); }
 }
-
 function saveUnknownSet(setObj) {
   localStorage.setItem(LS_UNKNOWN, JSON.stringify(Array.from(setObj)));
 }
-
 function maxDeckIndex() {
   return Math.max(0, Math.floor((ALL_CARDS.length - 1) / DECK_SIZE));
 }
+function getDeckSlice(deckIndex) {
+  const start = deckIndex * DECK_SIZE;
+  return ALL_CARDS.slice(start, start + DECK_SIZE);
+}
 
 /* =========================
-   5) DECK + FILTERS
+   STATE
    ========================= */
 let deckIndex = parseInt(localStorage.getItem(LS_DECK) || "0", 10);
 let unknownSet = loadUnknownSet();
 let reviewUnknownOnly = (localStorage.getItem(LS_REVIEW_UNKNOWN) || "0") === "1";
 
-function getDeckSlice() {
-  const start = deckIndex * DECK_SIZE;
-  return ALL_CARDS.slice(start, start + DECK_SIZE);
-}
-
-let baseDeck = getDeckSlice();
-
-function getActiveDeck() {
-  if (!reviewUnknownOnly) return baseDeck;
-  return baseDeck.filter(c => unknownSet.has(cardKey(c)));
-}
-
-let activeDeck = getActiveDeck();
-
-/* =========================
-   6) STATE
-   ========================= */
-// ENGLISH shows first
-let showingSpanish = false;
+let showingSpanish = false; // EN first
 let index = 0;
 
+let baseDeck = getDeckSlice(deckIndex);
+let activeDeck = [];
+
 /* =========================
-   7) ELEMENTS
+   ELEMENTS
    ========================= */
 const wordEl = document.getElementById("word");
 const subEl = document.getElementById("sub");
 const statusEl = document.getElementById("status");
 const badgeEl = document.getElementById("badge");
-
 const cardEl = document.getElementById("card");
+
 const prevBtn = document.getElementById("prevBtn");
 const flipBtn = document.getElementById("flipBtn");
 const nextBtn = document.getElementById("nextBtn");
 const unknownBtn = document.getElementById("unknownBtn");
 const reviewUnknownBtn = document.getElementById("reviewUnknownBtn");
 const clearUnknownBtn = document.getElementById("clearUnknownBtn");
+const resetBtn = document.getElementById("resetBtn");
 
 /* =========================
-   8) UI + LOGIC
+   RENDER
    ========================= */
+function getActiveDeck() {
+  if (!reviewUnknownOnly) return baseDeck;
+  return baseDeck.filter(c => unknownSet.has(cardKey(c)));
+}
+
 function currentCard() {
   if (!activeDeck.length) return null;
   return activeDeck[index];
@@ -336,15 +449,16 @@ function updateStatus() {
   const totalDecks = maxDeckIndex() + 1;
   const deckStart = deckIndex * DECK_SIZE + 1;
   const deckEnd = Math.min((deckIndex + 1) * DECK_SIZE, ALL_CARDS.length);
-
-  const mode = reviewUnknownOnly ? "MODE: Unknown only" : "MODE: All cards";
-  const unknownCountInDeck = baseDeck.filter(c => unknownSet.has(cardKey(c))).length;
+  const unknownCount = baseDeck.filter(c => unknownSet.has(cardKey(c))).length;
 
   statusEl.textContent =
-    `Deck ${deckIndex + 1}/${totalDecks} · Card ${activeDeck.length ? (index + 1) : 0}/${activeDeck.length} · ${mode} · Unknown in this deck: ${unknownCountInDeck} · Words ${deckStart}-${deckEnd}`;
+    `Deck ${deckIndex + 1}/${totalDecks} · Card ${activeDeck.length ? (index + 1) : 0}/${activeDeck.length} · ` +
+    `${reviewUnknownOnly ? "MODE: Unknown only" : "MODE: All cards"} · ` +
+    `Unknown in this deck: ${unknownCount} · Words ${deckStart}-${deckEnd} · Total cards: ${ALL_CARDS.length}`;
 }
 
 function render() {
+  baseDeck = getDeckSlice(deckIndex);
   activeDeck = getActiveDeck();
 
   if (!activeDeck.length) {
@@ -352,62 +466,52 @@ function render() {
       ? "No unknown cards in this deck"
       : "No cards in this deck";
     subEl.textContent = reviewUnknownOnly
-      ? "Press R to exit Unknown mode, or mark cards as unknown first."
-      : "";
+      ? "Press R to exit Unknown mode, or mark some cards as unknown (U)."
+      : "Check your ALL_CARDS list.";
     badgeEl.textContent = reviewUnknownOnly ? "Unknown only" : "EN → ES";
     updateStatus();
     return;
   }
 
-  // Keep index in range after filtering
   index = Math.max(0, Math.min(index, activeDeck.length - 1));
-
   const c = currentCard();
   const isUnknown = unknownSet.has(cardKey(c));
 
   wordEl.textContent = showingSpanish ? c.es : c.en;
   subEl.textContent = showingSpanish ? "Spanish" : "English";
-
   badgeEl.textContent = isUnknown ? "UNKNOWN" : (reviewUnknownOnly ? "Unknown only" : "EN → ES");
 
   updateStatus();
 }
 
+/* =========================
+   ACTIONS
+   ========================= */
 function flip() {
-  // Only flips the current card
   showingSpanish = !showingSpanish;
   render();
 }
-
 function nextCard() {
   if (!activeDeck.length) return;
   index = (index + 1) % activeDeck.length;
-  showingSpanish = false; // always start card on English
+  showingSpanish = false;
   render();
 }
-
 function prevCard() {
   if (!activeDeck.length) return;
   index = (index - 1 + activeDeck.length) % activeDeck.length;
-  showingSpanish = false; // always start card on English
+  showingSpanish = false;
   render();
 }
-
 function toggleUnknown() {
   const c = currentCard();
   if (!c) return;
-
   const k = cardKey(c);
   if (unknownSet.has(k)) unknownSet.delete(k);
   else unknownSet.add(k);
-
   saveUnknownSet(unknownSet);
-
-  // If we are in "unknown only" mode and you unmark the current card,
-  // it may disappear from the filtered list — render handles that.
   render();
 }
-
 function toggleReviewUnknownOnly() {
   reviewUnknownOnly = !reviewUnknownOnly;
   localStorage.setItem(LS_REVIEW_UNKNOWN, reviewUnknownOnly ? "1" : "0");
@@ -415,7 +519,6 @@ function toggleReviewUnknownOnly() {
   showingSpanish = false;
   render();
 }
-
 function clearUnknown() {
   if (!confirm("Clear ALL 'unknown' marks?")) return;
   unknownSet = new Set();
@@ -424,19 +527,28 @@ function clearUnknown() {
   showingSpanish = false;
   render();
 }
-
 function loadDeck(newDeckIndex) {
   deckIndex = Math.max(0, Math.min(newDeckIndex, maxDeckIndex()));
   localStorage.setItem(LS_DECK, String(deckIndex));
-
-  baseDeck = getDeckSlice();
+  index = 0;
+  showingSpanish = false;
+  render();
+}
+function resetAppState() {
+  if (!confirm("Reset app state (unknown marks + mode + deck)?")) return;
+  localStorage.removeItem(LS_UNKNOWN);
+  localStorage.removeItem(LS_REVIEW_UNKNOWN);
+  localStorage.removeItem(LS_DECK);
+  unknownSet = new Set();
+  reviewUnknownOnly = false;
+  deckIndex = 0;
   index = 0;
   showingSpanish = false;
   render();
 }
 
 /* =========================
-   9) EVENTS
+   EVENTS
    ========================= */
 cardEl.addEventListener("click", flip);
 flipBtn.addEventListener("click", flip);
@@ -445,31 +557,24 @@ prevBtn.addEventListener("click", prevCard);
 unknownBtn.addEventListener("click", toggleUnknown);
 reviewUnknownBtn.addEventListener("click", toggleReviewUnknownOnly);
 clearUnknownBtn.addEventListener("click", clearUnknown);
+resetBtn.addEventListener("click", resetAppState);
 
-document.addEventListener("keydown", e => {
-  // Flip
+document.addEventListener("keydown", (e) => {
   if (e.code === "Space") { e.preventDefault(); flip(); }
-
-  // Navigate
   if (e.key === "ArrowRight") nextCard();
   if (e.key === "ArrowLeft") prevCard();
-
-  // Unknown toggle
   if (e.key.toLowerCase() === "u") toggleUnknown();
-
-  // Review unknown mode
   if (e.key.toLowerCase() === "r") toggleReviewUnknownOnly();
-
-  // Deck navigation (optional)
   if (e.key.toLowerCase() === "n") loadDeck(deckIndex + 1);
   if (e.key.toLowerCase() === "p") loadDeck(deckIndex - 1);
 });
 
 /* =========================
-   10) START
+   START
    ========================= */
 render();
 </script>
 </body>
 </html>
+
 
