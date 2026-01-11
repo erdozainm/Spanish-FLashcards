@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Spanish Flashcards</title>
 
 <style>
@@ -31,18 +31,19 @@
     box-shadow: 0 20px 50px rgba(0,0,0,0.45);
     padding: 32px;
     box-sizing: border-box;
+    user-select: none;
   }
 
   .word {
-    font-size: clamp(2.4rem, 6vw, 5rem);
-    font-weight: 700;
+    font-size: clamp(2.2rem, 6vw, 5rem);
+    font-weight: 750;
     line-height: 1.15;
   }
 
   .label {
     margin-top: 12px;
     font-size: 0.95rem;
-    opacity: 0.7;
+    opacity: 0.75;
   }
 
   .controls {
@@ -60,7 +61,7 @@
     border-radius: 14px;
     padding: 12px 18px;
     font-size: 1rem;
-    font-weight: 600;
+    font-weight: 650;
     cursor: pointer;
   }
 
@@ -69,7 +70,21 @@
   .status {
     margin-top: 14px;
     font-size: 0.9rem;
-    opacity: 0.75;
+    opacity: 0.8;
+    text-align: center;
+    max-width: min(92vw, 900px);
+    line-height: 1.35;
+  }
+
+  .error {
+    margin-top: 10px;
+    max-width: min(92vw, 900px);
+    padding: 10px 12px;
+    border-radius: 12px;
+    background: rgba(255,70,70,0.12);
+    border: 1px solid rgba(255,70,70,0.35);
+    display: none;
+    white-space: pre-wrap;
   }
 </style>
 </head>
@@ -79,7 +94,7 @@
 <div class="card" id="card" title="Click to flip">
   <div>
     <div class="word" id="word">Loading…</div>
-    <div class="label" id="label"></div>
+    <div class="label" id="label">If stuck, check the error box below.</div>
   </div>
 </div>
 
@@ -93,172 +108,168 @@
 </div>
 
 <div class="status" id="status"></div>
+<div class="error" id="errorBox"></div>
 
 <script>
 /* =========================
-   FIRST 100 WORDS (edit here)
+   SHOW ERRORS ON PAGE
+   ========================= */
+(function () {
+  const errorBox = document.getElementById("errorBox");
+  window.addEventListener("error", (e) => {
+    errorBox.style.display = "block";
+    errorBox.textContent = "JS ERROR:\n" + (e.message || "Unknown error");
+  });
+})();
+
+/* =========================
+   DECK: NON-RULE CORE (paste more cards anytime)
    ========================= */
 const NON_RULE_CARDS = [
 
-/* =========================
-   CORE FUNCTION VERBS
-   ========================= */
-{ en: "to be (essential)", es: "ser" },
-{ en: "to be (temporary)", es: "estar" },
-{ en: "to have (auxiliary)", es: "haber" },
-{ en: "to have", es: "tener" },
-{ en: "to do / make", es: "hacer" },
-{ en: "to say / tell", es: "decir" },
-{ en: "to go", es: "ir" },
-{ en: "to come", es: "venir" },
-{ en: "to put", es: "poner" },
-{ en: "to stay", es: "quedar(se)" },
-{ en: "to bring", es: "traer" },
-{ en: "to carry / wear", es: "llevar" },
-{ en: "to give", es: "dar" },
-{ en: "to take", es: "tomar" },
-{ en: "to happen", es: "pasar" },
-{ en: "to leave / let", es: "dejar" },
-{ en: "to return", es: "volver" },
-{ en: "to leave", es: "salir" },
-{ en: "to enter", es: "entrar" },
-{ en: "to follow", es: "seguir" },
-{ en: "to seem", es: "parecer" },
-{ en: "to turn out", es: "resultar" },
-{ en: "to arrive", es: "llegar" },
-{ en: "to be lacking", es: "faltar" },
-{ en: "to be enough", es: "bastar" },
-{ en: "to be one's turn", es: "tocar" },
-{ en: "to count", es: "contar" },
-{ en: "to reach", es: "alcanzar" },
-{ en: "to achieve", es: "lograr" },
-{ en: "to prevent", es: "impedir" },
-{ en: "to allow", es: "permitir" },
-{ en: "to assume", es: "asumir" },
-{ en: "to support", es: "apoyar" },
-{ en: "to reject", es: "rechazar" },
-{ en: "to raise (issue)", es: "plantear" },
-{ en: "to address (topic)", es: "abordar" },
-{ en: "to point out", es: "señalar" },
-{ en: "to emphasize", es: "destacar" },
-{ en: "to question", es: "cuestionar" },
-{ en: "to realize", es: "darse cuenta" },
+  // CORE FUNCTION VERBS
+  { en: "to be (essential)", es: "ser" },
+  { en: "to be (temporary)", es: "estar" },
+  { en: "to have (auxiliary)", es: "haber" },
+  { en: "to have", es: "tener" },
+  { en: "to do / make", es: "hacer" },
+  { en: "to say / tell", es: "decir" },
+  { en: "to go", es: "ir" },
+  { en: "to come", es: "venir" },
+  { en: "to put", es: "poner" },
+  { en: "to stay", es: "quedar(se)" },
+  { en: "to bring", es: "traer" },
+  { en: "to carry / wear", es: "llevar" },
+  { en: "to give", es: "dar" },
+  { en: "to take", es: "tomar" },
+  { en: "to happen", es: "pasar" },
+  { en: "to leave / let", es: "dejar" },
+  { en: "to return", es: "volver" },
+  { en: "to leave", es: "salir" },
+  { en: "to enter", es: "entrar" },
+  { en: "to follow", es: "seguir" },
+  { en: "to seem", es: "parecer" },
+  { en: "to turn out", es: "resultar" },
+  { en: "to arrive", es: "llegar" },
+  { en: "to be lacking", es: "faltar" },
+  { en: "to be enough", es: "bastar" },
+  { en: "to be one's turn", es: "tocar" },
+  { en: "to count", es: "contar" },
+  { en: "to reach", es: "alcanzar" },
+  { en: "to achieve", es: "lograr" },
+  { en: "to prevent", es: "impedir" },
+  { en: "to allow", es: "permitir" },
+  { en: "to assume", es: "asumir" },
+  { en: "to support", es: "apoyar" },
+  { en: "to reject", es: "rechazar" },
+  { en: "to raise (issue)", es: "plantear" },
+  { en: "to address (topic)", es: "abordar" },
+  { en: "to point out", es: "señalar" },
+  { en: "to emphasize", es: "destacar" },
+  { en: "to question", es: "cuestionar" },
+  { en: "to realize", es: "darse cuenta" },
 
-/* =========================
-   FIXED VERB PHRASES
-   ========================= */
-{ en: "to carry out", es: "llevar a cabo" },
-{ en: "to have to", es: "tener que" },
-{ en: "to have just done", es: "acabar de" },
-{ en: "to do again", es: "volver a" },
+  // FIXED VERB PHRASES
+  { en: "to carry out", es: "llevar a cabo" },
+  { en: "to have to", es: "tener que" },
+  { en: "to have just done", es: "acabar de" },
+  { en: "to do again", es: "volver a" },
 
-/* =========================
-   PREPOSITIONS & STRUCTURES
-   ========================= */
-{ en: "to / at", es: "a" },
-{ en: "of / from", es: "de" },
-{ en: "for / by", es: "por" },
-{ en: "for / in order to", es: "para" },
-{ en: "with", es: "con" },
-{ en: "without", es: "sin" },
-{ en: "about", es: "sobre" },
-{ en: "between", es: "entre" },
-{ en: "toward", es: "hacia" },
-{ en: "from", es: "desde" },
-{ en: "until", es: "hasta" },
-{ en: "according to", es: "según" },
-{ en: "by means of", es: "mediante" },
-{ en: "despite", es: "a pesar de" },
-{ en: "instead of", es: "en lugar de" },
+  // PREPOSITIONS & STRUCTURES
+  { en: "to / at", es: "a" },
+  { en: "of / from", es: "de" },
+  { en: "for / by", es: "por" },
+  { en: "for / in order to", es: "para" },
+  { en: "with", es: "con" },
+  { en: "without", es: "sin" },
+  { en: "about", es: "sobre" },
+  { en: "between", es: "entre" },
+  { en: "toward", es: "hacia" },
+  { en: "from", es: "desde" },
+  { en: "until", es: "hasta" },
+  { en: "according to", es: "según" },
+  { en: "by means of", es: "mediante" },
+  { en: "despite", es: "a pesar de" },
+  { en: "instead of", es: "en lugar de" },
 
-/* =========================
-   CONNECTORS (NON-CONVERTIBLE)
-   ========================= */
-{ en: "however", es: "sin embargo" },
-{ en: "therefore", es: "por lo tanto" },
-{ en: "nevertheless", es: "no obstante" },
-{ en: "on the contrary", es: "por el contrario" },
-{ en: "on the other hand", es: "en cambio" },
-{ en: "in fact", es: "de hecho" },
-{ en: "at the same time", es: "a la vez" },
-{ en: "even so", es: "aun así" },
-{ en: "to a certain extent", es: "hasta cierto punto" },
-{ en: "in this sense", es: "en este sentido" },
-{ en: "overall", es: "en conjunto" },
-{ en: "generally", es: "por lo general" },
-{ en: "at the end of the day", es: "al fin y al cabo" },
-{ en: "around", es: "en torno a" },
-{ en: "as / while", es: "a medida que" },
+  // CONNECTORS
+  { en: "however", es: "sin embargo" },
+  { en: "therefore", es: "por lo tanto" },
+  { en: "nevertheless", es: "no obstante" },
+  { en: "on the contrary", es: "por el contrario" },
+  { en: "on the other hand", es: "en cambio" },
+  { en: "in fact", es: "de hecho" },
+  { en: "at the same time", es: "a la vez" },
+  { en: "even so", es: "aun así" },
+  { en: "to a certain extent", es: "hasta cierto punto" },
+  { en: "in this sense", es: "en este sentido" },
+  { en: "overall", es: "en conjunto" },
+  { en: "generally", es: "por lo general" },
+  { en: "at the end of the day", es: "al fin y al cabo" },
+  { en: "around", es: "en torno a" },
+  { en: "as / while", es: "a medida que" },
 
-/* =========================
-   ABSTRACT NOUNS (RULE-BREAKING)
-   ========================= */
-{ en: "environment", es: "el entorno" },
-{ en: "framework", es: "el marco" },
-{ en: "scope", es: "el ámbito" },
-{ en: "challenge", es: "el reto" },
-{ en: "achievement", es: "el logro" },
-{ en: "goal", es: "la meta" },
-{ en: "lack", es: "la falta" },
-{ en: "threat", es: "la amenaza" },
-{ en: "inequality", es: "la desigualdad" },
-{ en: "responsibility", es: "la responsabilidad" },
-{ en: "authority", es: "la autoridad" },
-{ en: "power", es: "el poder" },
-{ en: "control", es: "el control" },
-{ en: "burden", es: "la carga" },
-{ en: "approach", es: "el enfoque" },
-{ en: "deadline", es: "el plazo" },
-{ en: "stance", es: "la postura" },
-{ en: "doubt", es: "la duda" },
-{ en: "guilt", es: "la culpa" },
-{ en: "shame", es: "la vergüenza" },
-{ en: "fear", es: "el miedo" },
+  // ABSTRACT NOUNS
+  { en: "environment", es: "el entorno" },
+  { en: "framework", es: "el marco" },
+  { en: "scope", es: "el ámbito" },
+  { en: "challenge", es: "el reto" },
+  { en: "achievement", es: "el logro" },
+  { en: "goal", es: "la meta" },
+  { en: "lack", es: "la falta" },
+  { en: "threat", es: "la amenaza" },
+  { en: "inequality", es: "la desigualdad" },
+  { en: "responsibility", es: "la responsabilidad" },
+  { en: "authority", es: "la autoridad" },
+  { en: "power", es: "el poder" },
+  { en: "control", es: "el control" },
+  { en: "burden", es: "la carga" },
+  { en: "approach", es: "el enfoque" },
+  { en: "deadline", es: "el plazo" },
+  { en: "stance", es: "la postura" },
+  { en: "doubt", es: "la duda" },
+  { en: "guilt", es: "la culpa" },
+  { en: "shame", es: "la vergüenza" },
+  { en: "fear", es: "el miedo" },
 
-/* =========================
-   ADJECTIVES THAT MISLEAD
-   ========================= */
-{ en: "current", es: "actual" },
-{ en: "common", es: "común" },
-{ en: "own", es: "propio/a" },
-{ en: "foreign", es: "ajeno/a" },
-{ en: "mere", es: "mero/a" },
-{ en: "certain", es: "cierto/a" },
-{ en: "serious", es: "grave" },
-{ en: "strong", es: "fuerte" },
-{ en: "mild", es: "leve" },
-{ en: "subtle", es: "sutil" },
-{ en: "sensitive", es: "sensible" },
-{ en: "responsible", es: "responsable" },
-{ en: "pending", es: "pendiente" },
-{ en: "willing", es: "dispuesto/a" },
-{ en: "capable", es: "capaz" },
-{ en: "firm", es: "firme" },
+  // ADJECTIVES THAT MISLEAD
+  { en: "current", es: "actual" },
+  { en: "common", es: "común" },
+  { en: "own", es: "propio/a" },
+  { en: "foreign", es: "ajeno/a" },
+  { en: "mere", es: "mero/a" },
+  { en: "certain", es: "cierto/a" },
+  { en: "serious", es: "grave" },
+  { en: "strong", es: "fuerte" },
+  { en: "mild", es: "leve" },
+  { en: "subtle", es: "sutil" },
+  { en: "sensitive", es: "sensible" },
+  { en: "responsible", es: "responsable" },
+  { en: "pending", es: "pendiente" },
+  { en: "willing", es: "dispuesto/a" },
+  { en: "capable", es: "capaz" },
+  { en: "firm", es: "firme" },
 
-/* =========================
-   FUNCTION WORDS
-   ========================= */
-{ en: "it (neutral)", es: "lo" },
-{ en: "oneself / passive", es: "se" },
-{ en: "already", es: "ya" },
-{ en: "still / yet", es: "aún" },
-{ en: "barely", es: "apenas" },
-{ en: "even", es: "siquiera" },
-{ en: "same", es: "mismo/a" },
-{ en: "such", es: "tal" },
-{ en: "whose", es: "cuyo/a" },
-{ en: "how much / many", es: "cuanto/a" }
-
+  // FUNCTION WORDS
+  { en: "it (neutral)", es: "lo" },
+  { en: "oneself / passive", es: "se" },
+  { en: "already", es: "ya" },
+  { en: "still / yet", es: "aún" },
+  { en: "barely", es: "apenas" },
+  { en: "even", es: "siquiera" },
+  { en: "same", es: "mismo/a" },
+  { en: "such", es: "tal" },
+  { en: "whose", es: "cuyo/a" },
+  { en: "how much / many", es: "cuanto/a" }
 ];
-
 
 /* =========================
    STATE
    ========================= */
-let deck = [...ALL_CARDS_FULL];
+let deck = [...NON_RULE_CARDS];   // <-- THIS is the correct deck variable
 let index = 0;
-let startSide = "EN";        // "EN" or "ES"
-let showingSpanish = false; // current side
+let startSide = "EN";             // "EN" or "ES"
+let showingSpanish = false;       // current side
 let audioOn = true;
 
 /* =========================
@@ -271,22 +282,8 @@ const statusEl = document.getElementById("status");
 const startSideLabel = document.getElementById("startSideLabel");
 const audioLabel = document.getElementById("audioLabel");
 
-document.getElementById("prevBtn").addEventListener("click", prevCard);
-document.getElementById("flipBtn").addEventListener("click", flipCard);
-document.getElementById("nextBtn").addEventListener("click", nextCard);
-document.getElementById("shuffleBtn").addEventListener("click", shuffleDeck);
-document.getElementById("startBtn").addEventListener("click", toggleStart);
-document.getElementById("audioBtn").addEventListener("click", toggleAudio);
-cardEl.addEventListener("click", flipCard);
-
-document.addEventListener("keydown", (e) => {
-  if (e.code === "Space") { e.preventDefault(); flipCard(); }
-  if (e.key === "ArrowRight") nextCard();
-  if (e.key === "ArrowLeft") prevCard();
-});
-
 /* =========================
-   AUDIO (works on laptop; Quest may not support)
+   AUDIO (Quest may not support)
    ========================= */
 function speak(text, lang) {
   if (!audioOn) return;
@@ -304,13 +301,23 @@ function speak(text, lang) {
    RENDER
    ========================= */
 function render() {
+  if (!deck.length) {
+    wordEl.textContent = "No cards";
+    labelEl.textContent = "";
+    statusEl.textContent = "";
+    return;
+  }
+
   const c = deck[index];
   const text = showingSpanish ? c.es : c.en;
   const lang = showingSpanish ? "es-ES" : "en-US";
 
   wordEl.textContent = text;
   labelEl.textContent = showingSpanish ? "Spanish" : "English";
-  statusEl.textContent = `Card ${index + 1} / ${deck.length} · Start: ${startSide} · Audio: ${("speechSynthesis" in window) ? (audioOn ? "ON" : "OFF") : "Not supported"}`;
+  statusEl.textContent =
+    `Card ${index + 1} / ${deck.length} · Start: ${startSide} · Audio: ${
+      ("speechSynthesis" in window) ? (audioOn ? "ON" : "OFF") : "Not supported"
+    }`;
 
   speak(text, lang);
 }
@@ -357,6 +364,23 @@ function toggleAudio() {
   audioLabel.textContent = audioOn ? "ON" : "OFF";
   render();
 }
+
+/* =========================
+   EVENTS
+   ========================= */
+document.getElementById("prevBtn").addEventListener("click", prevCard);
+document.getElementById("flipBtn").addEventListener("click", flipCard);
+document.getElementById("nextBtn").addEventListener("click", nextCard);
+document.getElementById("shuffleBtn").addEventListener("click", shuffleDeck);
+document.getElementById("startBtn").addEventListener("click", toggleStart);
+document.getElementById("audioBtn").addEventListener("click", toggleAudio);
+cardEl.addEventListener("click", flipCard);
+
+document.addEventListener("keydown", (e) => {
+  if (e.code === "Space") { e.preventDefault(); flipCard(); }
+  if (e.key === "ArrowRight") nextCard();
+  if (e.key === "ArrowLeft") prevCard();
+});
 
 /* =========================
    INIT
