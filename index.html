@@ -128,6 +128,238 @@
 const NON_RULE_CARDS = [
 
   // CORE FUNCTION VERBS
+  
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Spanish Flashcards (Advanced Prep)</title>
+
+<style>
+  body{
+    margin:0;
+    min-height:100vh;
+    background:#0b0b0b;
+    color:#f3f3f3;
+    font-family:system-ui,-apple-system,Helvetica,Arial,sans-serif;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+  }
+  .card{
+    width:min(92vw,1050px);
+    height:min(55vh,540px);
+    background:#141414;
+    border-radius:28px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    cursor:pointer;
+    user-select:none;
+    box-shadow:0 22px 60px rgba(0,0,0,0.45);
+    padding:32px;
+    box-sizing:border-box;
+    border:1px solid rgba(255,255,255,0.10);
+  }
+  .word{
+    font-size:clamp(2.0rem,5.2vw,4.9rem);
+    font-weight:750;
+    line-height:1.12;
+  }
+  .label{
+    margin-top:12px;
+    font-size:0.95rem;
+    opacity:0.72;
+  }
+  .controls{
+    margin-top:18px;
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    justify-content:center;
+  }
+  button{
+    background:#1f1f1f;
+    color:#fff;
+    border:1px solid rgba(255,255,255,0.15);
+    border-radius:14px;
+    padding:12px 16px;
+    font-size:1rem;
+    font-weight:650;
+    cursor:pointer;
+    min-width:150px;
+  }
+  button:active{ transform:translateY(1px); }
+  .status{
+    margin-top:12px;
+    font-size:0.95rem;
+    opacity:0.78;
+    text-align:center;
+    max-width:min(92vw,1050px);
+    line-height:1.35;
+  }
+  .errorBox{
+    margin-top:10px;
+    max-width:min(92vw,1050px);
+    padding:10px 12px;
+    border-radius:12px;
+    background:rgba(255,70,70,0.12);
+    border:1px solid rgba(255,70,70,0.35);
+    display:none;
+    white-space:pre-wrap;
+    font-size:0.95rem;
+  }
+  .tiny{
+    margin-top:8px;
+    opacity:0.65;
+    font-size:0.9rem;
+    text-align:center;
+  }
+</style>
+</head>
+
+<body>
+
+<div class="card" id="card" title="Click to flip">
+  <div>
+    <div class="word" id="word">Loading…</div>
+    <div class="label" id="label">Click the card to flip.</div>
+  </div>
+</div>
+
+<div class="controls">
+  <button id="prevBtn">← Prev</button>
+  <button id="flipBtn">Flip (Space)</button>
+  <button id="nextBtn">Next →</button>
+  <button id="shuffleBtn">Shuffle</button>
+  <button id="startBtn">Start: <span id="startSideLabel">EN</span></button>
+  <button id="audioBtn">Audio: <span id="audioLabel">ON</span></button>
+</div>
+
+<div class="status" id="status"></div>
+<div class="errorBox" id="errorBox"></div>
+<div class="tiny">Keys: Space=Flip · ←/→ navigate</div>
+
+<script>
+/* =========================
+   SHOW JS ERRORS ON PAGE
+   ========================= */
+(function () {
+  const errorBox = document.getElementById("errorBox");
+  window.addEventListener("error", (e) => {
+    errorBox.style.display = "block";
+    errorBox.textContent = "JS ERROR:\n" + (e.message || "Unknown error");
+  });
+})();
+
+/* =========================
+   1) CONJUGATION ENDINGS (flashcards)
+   EN side = endings, ES side = tense/use label
+   ========================= */
+const CONJUGATION_CARDS = [
+  { en: "-o, -as, -a, -amos, -áis, -an", es: "Present -AR" },
+  { en: "-o, -es, -e, -emos, -éis, -en", es: "Present -ER" },
+  { en: "-o, -es, -e, -imos, -ís, -en", es: "Present -IR" },
+
+  { en: "-é, -aste, -ó, -amos, -asteis, -aron", es: "Preterite -AR (completed past)" },
+  { en: "-í, -iste, -ió, -imos, -isteis, -ieron", es: "Preterite -ER/-IR (completed past)" },
+
+  { en: "-aba, -abas, -aba, -ábamos, -abais, -aban", es: "Imperfect -AR (habit/background)" },
+  { en: "-ía, -ías, -ía, -íamos, -íais, -ían", es: "Imperfect -ER/-IR (habit/background)" },
+
+  { en: "infinitive + -é, -ás, -á, -emos, -éis, -án", es: "Future (all verbs)" },
+  { en: "infinitive + -ía, -ías, -ía, -íamos, -íais, -ían", es: "Conditional (all verbs)" },
+
+  { en: "-e, -es, -e, -emos, -éis, -en", es: "Present Subjunctive -AR" },
+  { en: "-a, -as, -a, -amos, -áis, -an", es: "Present Subjunctive -ER/-IR" },
+
+  { en: "-ra, -ras, -ra, -ramos, -rais, -ran", es: "Imperfect Subjunctive (-ra)" },
+  { en: "-se, -ses, -se, -semos, -seis, -sen", es: "Imperfect Subjunctive (-se)" },
+];
+
+/* =========================
+   2) IRREGULAR VERBS (high-yield conjugations)
+   EN side = verb + tense
+   ES side = full conjugation
+   ========================= */
+const IRREGULAR_VERB_CARDS = [
+  { en: "ser (present)", es: "soy, eres, es, somos, sois, son" },
+  { en: "ser (preterite)", es: "fui, fuiste, fue, fuimos, fuisteis, fueron" },
+  { en: "ser (imperfect)", es: "era, eras, era, éramos, erais, eran" },
+  { en: "ser (subjunctive)", es: "sea, seas, sea, seamos, seáis, sean" },
+  { en: "ser (future)", es: "seré, serás, será, seremos, seréis, serán" },
+  { en: "ser (conditional)", es: "sería, serías, sería, seríamos, seríais, serían" },
+
+  { en: "estar (present)", es: "estoy, estás, está, estamos, estáis, están" },
+  { en: "estar (preterite)", es: "estuve, estuviste, estuvo, estuvimos, estuvisteis, estuvieron" },
+  { en: "estar (imperfect)", es: "estaba, estabas, estaba, estábamos, estabais, estaban" },
+  { en: "estar (subjunctive)", es: "esté, estés, esté, estemos, estéis, estén" },
+
+  { en: "tener (present)", es: "tengo, tienes, tiene, tenemos, tenéis, tienen" },
+  { en: "tener (preterite)", es: "tuve, tuviste, tuvo, tuvimos, tuvisteis, tuvieron" },
+  { en: "tener (imperfect)", es: "tenía, tenías, tenía, teníamos, teníais, tenían" },
+  { en: "tener (subjunctive)", es: "tenga, tengas, tenga, tengamos, tengáis, tengan" },
+  { en: "tener (future)", es: "tendré, tendrás, tendrá, tendremos, tendréis, tendrán" },
+  { en: "tener (conditional)", es: "tendría, tendrías, tendría, tendríamos, tendríais, tendrían" },
+
+  { en: "ir (present)", es: "voy, vas, va, vamos, vais, van" },
+  { en: "ir (preterite)", es: "fui, fuiste, fue, fuimos, fuisteis, fueron" },
+  { en: "ir (imperfect)", es: "iba, ibas, iba, íbamos, ibais, iban" },
+  { en: "ir (subjunctive)", es: "vaya, vayas, vaya, vayamos, vayáis, vayan" },
+
+  { en: "venir (present)", es: "vengo, vienes, viene, venimos, venís, vienen" },
+  { en: "venir (preterite)", es: "vine, viniste, vino, vinimos, vinisteis, vinieron" },
+  { en: "venir (subjunctive)", es: "venga, vengas, venga, vengamos, vengáis, vengan" },
+  { en: "venir (future)", es: "vendré, vendrás, vendrá, vendremos, vendréis, vendrán" },
+
+  { en: "hacer (present)", es: "hago, haces, hace, hacemos, hacéis, hacen" },
+  { en: "hacer (preterite)", es: "hice, hiciste, hizo, hicimos, hicisteis, hicieron" },
+  { en: "hacer (subjunctive)", es: "haga, hagas, haga, hagamos, hagáis, hagan" },
+  { en: "hacer (future)", es: "haré, harás, hará, haremos, haréis, harán" },
+  { en: "hacer (conditional)", es: "haría, harías, haría, haríamos, haríais, harían" },
+
+  { en: "decir (present)", es: "digo, dices, dice, decimos, decís, dicen" },
+  { en: "decir (preterite)", es: "dije, dijiste, dijo, dijimos, dijisteis, dijeron" },
+  { en: "decir (subjunctive)", es: "diga, digas, diga, digamos, digáis, digan" },
+  { en: "decir (future)", es: "diré, dirás, dirá, diremos, diréis, dirán" },
+
+  { en: "poder (present)", es: "puedo, puedes, puede, podemos, podéis, pueden" },
+  { en: "poder (preterite)", es: "pude, pudiste, pudo, pudimos, pudisteis, pudieron" },
+  { en: "poder (subjunctive)", es: "pueda, puedas, pueda, podamos, podáis, puedan" },
+  { en: "poder (future)", es: "podré, podrás, podrá, podremos, podréis, podrán" },
+
+  { en: "saber (present)", es: "sé, sabes, sabe, sabemos, sabéis, saben" },
+  { en: "saber (preterite)", es: "supe, supiste, supo, supimos, supisteis, supieron" },
+  { en: "saber (subjunctive)", es: "sepa, sepas, sepa, sepamos, sepáis, sepan" },
+
+  { en: "querer (present)", es: "quiero, quieres, quiere, queremos, queréis, quieren" },
+  { en: "querer (preterite)", es: "quise, quisiste, quiso, quisimos, quisisteis, quisieron" },
+  { en: "querer (subjunctive)", es: "quiera, quieras, quiera, queramos, queráis, quieran" },
+
+  { en: "haber (present perfect aux)", es: "he, has, ha, hemos, habéis, han" },
+  { en: "haber (imperfect)", es: "había, habías, había, habíamos, habíais, habían" },
+  { en: "haber (subjunctive)", es: "haya, hayas, haya, hayamos, hayáis, hayan" },
+
+  { en: "poner (present)", es: "pongo, pones, pone, ponemos, ponéis, ponen" },
+  { en: "poner (preterite)", es: "puse, pusiste, puso, pusimos, pusisteis, pusieron" },
+  { en: "poner (subjunctive)", es: "ponga, pongas, ponga, pongamos, pongáis, pongan" },
+
+  { en: "salir (present)", es: "salgo, sales, sale, salimos, salís, salen" },
+  { en: "salir (preterite)", es: "salí, saliste, salió, salimos, salisteis, salieron" },
+
+  { en: "traer (preterite)", es: "traje, trajiste, trajo, trajimos, trajisteis, trajeron" },
+  { en: "tener/estar/andar (preterite family)", es: "tuve/estuve/anduve… (uve pattern)" },
+];
+
+/* =========================
+   3) NON-LATIN-CONVERSION / NON-PREDICTABLE CORE (~300+)
+   EN side = English, ES side = Spanish
+   ========================= */
+const NON_RULE_CARDS = [
+  // --- Core function words / adverbs
   { en: "to be (essential)", es: "ser" },
   { en: "to be (temporary)", es: "estar" },
   { en: "to have (auxiliary)", es: "haber" },
@@ -260,16 +492,296 @@ const NON_RULE_CARDS = [
   { en: "same", es: "mismo/a" },
   { en: "such", es: "tal" },
   { en: "whose", es: "cuyo/a" },
-  { en: "how much / many", es: "cuanto/a" }
+  { en: "how much / many", es: "cuanto/a" }{ en:"already", es:"ya" },
+  { en:"still / yet", es:"todavía" },
+  { en:"still / yet (also)", es:"aún" },
+  { en:"barely / hardly", es:"apenas" },
+  { en:"almost", es:"casi" },
+  { en:"even (emphasis)", es:"siquiera" },
+  { en:"maybe", es:"quizá(s)" },
+  { en:"maybe (also)", es:"tal vez" },
+  { en:"maybe (spoken)", es:"a lo mejor" },
+  { en:"then", es:"entonces" },
+  { en:"so (therefore)", es:"así que" },
+  { en:"so / thus", es:"así" },
+  { en:"also", es:"también" },
+  { en:"not… either / neither", es:"tampoco" },
+  { en:"too much", es:"demasiado" },
+  { en:"quite / rather", es:"bastante" },
+  { en:"a lot / many", es:"mucho" },
+  { en:"few / little", es:"poco" },
+  { en:"nothing", es:"nada" },
+  { en:"something", es:"algo" },
+  { en:"someone", es:"alguien" },
+  { en:"nobody", es:"nadie" },
+  { en:"anyone / whoever", es:"cualquiera" },
+  { en:"everything", es:"todo" },
+  { en:"each", es:"cada" },
+  { en:"same", es:"mismo/a" },
+  { en:"own", es:"propio/a" },
+  { en:"such", es:"tal" },
+  { en:"another", es:"otro/a" },
+
+  // --- demonstratives / location / time
+  { en:"here", es:"aquí" },
+  { en:"there", es:"ahí" },
+  { en:"over there", es:"allí" },
+  { en:"now", es:"ahora" },
+  { en:"today", es:"hoy" },
+  { en:"tomorrow", es:"mañana" },
+  { en:"yesterday", es:"ayer" },
+  { en:"always", es:"siempre" },
+  { en:"never", es:"nunca" },
+  { en:"sometimes", es:"a veces" },
+  { en:"often", es:"a menudo" },
+  { en:"rarely", es:"rara vez" },
+
+  // --- pronouns/clitics
+  { en:"it (neutral)", es:"lo" },
+  { en:"oneself / passive", es:"se" },
+  { en:"to him/her (indirect)", es:"le" },
+  { en:"to them (indirect)", es:"les" },
+  { en:"whose", es:"cuyo/a" },
+  { en:"how much/many", es:"cuánto/a" },
+
+  // --- prepositions / structures
+  { en:"to / at", es:"a" },
+  { en:"of / from", es:"de" },
+  { en:"for / by", es:"por" },
+  { en:"for / in order to", es:"para" },
+  { en:"with", es:"con" },
+  { en:"without", es:"sin" },
+  { en:"about / on", es:"sobre" },
+  { en:"between", es:"entre" },
+  { en:"toward", es:"hacia" },
+  { en:"from", es:"desde" },
+  { en:"until", es:"hasta" },
+  { en:"according to", es:"según" },
+  { en:"by means of", es:"mediante" },
+  { en:"despite", es:"a pesar de" },
+  { en:"instead of", es:"en lugar de" },
+  { en:"in front of", es:"delante de" },
+  { en:"behind", es:"detrás de" },
+  { en:"next to", es:"al lado de" },
+  { en:"around (location)", es:"alrededor de" },
+  { en:"through", es:"a través de" },
+  { en:"because of (neutral)", es:"a causa de" },
+  { en:"because of (blame)", es:"por culpa de" },
+  { en:"regarding", es:"con respecto a" },
+  { en:"as for", es:"en cuanto a" },
+
+  // --- connectors/discourse chunks
+  { en:"however", es:"sin embargo" },
+  { en:"therefore", es:"por lo tanto" },
+  { en:"nevertheless", es:"no obstante" },
+  { en:"on the contrary", es:"por el contrario" },
+  { en:"on the other hand", es:"por otro lado" },
+  { en:"instead (contrast)", es:"en cambio" },
+  { en:"in fact", es:"de hecho" },
+  { en:"as a result", es:"como resultado" },
+  { en:"as a consequence", es:"como consecuencia" },
+  { en:"for that reason", es:"por esa razón" },
+  { en:"that’s why", es:"por eso" },
+  { en:"even so", es:"aun así" },
+  { en:"at the same time", es:"a la vez" },
+  { en:"overall", es:"en conjunto" },
+  { en:"generally", es:"por lo general" },
+  { en:"in summary", es:"en resumen" },
+  { en:"in conclusion", es:"en conclusión" },
+  { en:"in other words", es:"en otras palabras" },
+  { en:"to a certain extent", es:"hasta cierto punto" },
+  { en:"in this sense", es:"en este sentido" },
+  { en:"by the way", es:"por cierto" },
+  { en:"at the end of the day", es:"al fin y al cabo" },
+  { en:"as long as", es:"siempre que" },
+  { en:"even if", es:"incluso si" },
+  { en:"as soon as", es:"en cuanto" },
+  { en:"as soon as (also)", es:"tan pronto como" },
+  { en:"while", es:"mientras" },
+  { en:"whereas", es:"mientras que" },
+  { en:"although", es:"aunque" },
+  { en:"regardless of", es:"independientemente de" },
+  { en:"in terms of", es:"en términos de" },
+
+  // --- core verbs (high frequency, non-convertible)
+  { en:"to be (essential)", es:"ser" },
+  { en:"to be (state)", es:"estar" },
+  { en:"to have", es:"tener" },
+  { en:"to do / make", es:"hacer" },
+  { en:"to go", es:"ir" },
+  { en:"to come", es:"venir" },
+  { en:"to say / tell", es:"decir" },
+  { en:"to put", es:"poner" },
+  { en:"to bring", es:"traer" },
+  { en:"to carry / wear", es:"llevar" },
+  { en:"to give", es:"dar" },
+  { en:"to take", es:"tomar" },
+  { en:"to happen", es:"pasar" },
+  { en:"to leave / let", es:"dejar" },
+  { en:"to return", es:"volver" },
+  { en:"to leave", es:"salir" },
+  { en:"to enter", es:"entrar" },
+  { en:"to stay / remain", es:"quedar(se)" },
+  { en:"to follow", es:"seguir" },
+  { en:"to seem", es:"parecer" },
+  { en:"to turn out", es:"resultar" },
+  { en:"to arrive", es:"llegar" },
+  { en:"to miss / be lacking", es:"faltar" },
+  { en:"to be enough", es:"bastar" },
+  { en:"to be one's turn / to touch", es:"tocar" },
+  { en:"to count / tell", es:"contar" },
+  { en:"to reach", es:"alcanzar" },
+  { en:"to achieve", es:"lograr" },
+  { en:"to prevent", es:"impedir" },
+  { en:"to allow", es:"permitir" },
+  { en:"to assume / take on", es:"asumir" },
+  { en:"to support", es:"apoyar" },
+  { en:"to reject", es:"rechazar" },
+  { en:"to raise (an issue)", es:"plantear" },
+  { en:"to address (a topic)", es:"abordar" },
+  { en:"to point out", es:"señalar" },
+  { en:"to emphasize", es:"destacar" },
+  { en:"to question", es:"cuestionar" },
+  { en:"to realize", es:"darse cuenta" },
+  { en:"to find", es:"encontrar" },
+  { en:"to look for", es:"buscar" },
+  { en:"to think", es:"pensar" },
+  { en:"to believe", es:"creer" },
+  { en:"to feel", es:"sentir" },
+  { en:"to hear", es:"oír" },
+  { en:"to see", es:"ver" },
+  { en:"to know (fact)", es:"saber" },
+  { en:"to know (person/place)", es:"conocer" },
+  { en:"to want", es:"querer" },
+  { en:"to be able to", es:"poder" },
+  { en:"to ask (question)", es:"preguntar" },
+  { en:"to ask for / request", es:"pedir" },
+  { en:"to answer", es:"responder" },
+  { en:"to try", es:"intentar" },
+  { en:"to attempt", es:"tratar de" },
+  { en:"to become (sudden)", es:"ponerse" },
+  { en:"to become (change)", es:"volverse" },
+  { en:"to become (identity)", es:"hacerse" },
+  { en:"to get used to", es:"acostumbrarse a" },
+  { en:"to remember", es:"recordar" },
+  { en:"to forget", es:"olvidar" },
+  { en:"to keep doing", es:"seguir + gerundio" },
+  { en:"to stop doing", es:"dejar de" },
+  { en:"to have to", es:"tener que" },
+  { en:"to have just done", es:"acabar de" },
+  { en:"to carry out", es:"llevar a cabo" },
+
+  // --- high-frequency nouns (non-predictable / core)
+  { en:"people", es:"la gente" },
+  { en:"place", es:"el lugar" },
+  { en:"time", es:"el tiempo" },
+  { en:"moment", es:"el momento" },
+  { en:"way / manner", es:"la manera" },
+  { en:"way / form", es:"la forma" },
+  { en:"side", es:"el lado" },
+  { en:"end", es:"el fin" },
+  { en:"beginning", es:"el principio" },
+  { en:"case", es:"el caso" },
+  { en:"truth", es:"la verdad" },
+  { en:"lie", es:"la mentira" },
+  { en:"mistake", es:"el error" },
+  { en:"step", es:"el paso" },
+  { en:"need", es:"la necesidad" },
+  { en:"lack", es:"la falta" },
+  { en:"risk", es:"el riesgo" },
+  { en:"fear", es:"el miedo" },
+  { en:"anger", es:"la rabia" },
+  { en:"anger (also)", es:"el enojo" },
+  { en:"sadness", es:"la tristeza" },
+  { en:"joy", es:"la alegría" },
+  { en:"shame", es:"la vergüenza" },
+  { en:"guilt", es:"la culpa" },
+  { en:"pain", es:"el dolor" },
+  { en:"harm", es:"el daño" },
+  { en:"danger", es:"el peligro" },
+  { en:"life", es:"la vida" },
+  { en:"death", es:"la muerte" },
+  { en:"world", es:"el mundo" },
+  { en:"home", es:"la casa" },
+
+  // --- abstract nouns that break conversion intuition (high-yield)
+  { en:"goal", es:"la meta" },
+  { en:"challenge", es:"el reto" },
+  { en:"environment / surroundings", es:"el entorno" },
+  { en:"framework", es:"el marco" },
+  { en:"scope / field", es:"el ámbito" },
+  { en:"achievement", es:"el logro" },
+  { en:"threat", es:"la amenaza" },
+  { en:"burden", es:"la carga" },
+  { en:"deadline", es:"el plazo" },
+  { en:"treatment / deal", es:"el trato" },
+  { en:"stance", es:"la postura" },
+  { en:"doubt", es:"la duda" },
+  { en:"power", es:"el poder" },
+  { en:"control", es:"el control" },
+  { en:"authority", es:"la autoridad" },
+  { en:"responsibility", es:"la responsabilidad" },
+
+  // --- adjectives/adverbs (false-friend-ish / non-predictable usage)
+  { en:"current (NOT 'actual' in English)", es:"actual" },
+  { en:"common (NOT 'normal')", es:"común" },
+  { en:"serious", es:"grave" },
+  { en:"strong", es:"fuerte" },
+  { en:"mild", es:"leve" },
+  { en:"subtle", es:"sutil" },
+  { en:"sensitive", es:"sensible" },
+  { en:"capable", es:"capaz" },
+  { en:"willing", es:"dispuesto/a" },
+  { en:"firm", es:"firme" },
+  { en:"weird / rare", es:"raro/a" },
+  { en:"strange", es:"extraño/a" },
+  { en:"quiet", es:"callado/a" },
+  { en:"calm", es:"tranquilo/a" },
+  { en:"angry", es:"enojado/a" },
+  { en:"upset", es:"molesto/a" },
+  { en:"tired", es:"cansado/a" },
+  { en:"busy", es:"ocupado/a" },
+  { en:"safe", es:"seguro/a" },
+  { en:"dangerous", es:"peligroso/a" },
+  { en:"near", es:"cerca" },
+  { en:"far", es:"lejos" },
+  { en:"quickly", es:"deprisa" },
+  { en:"slowly", es:"despacio" },
+
+  // --- speaking / class chunks
+  { en:"I think that…", es:"creo que…" },
+  { en:"I don’t think that…", es:"no creo que…" },
+  { en:"it seems that…", es:"parece que…" },
+  { en:"it turns out that…", es:"resulta que…" },
+  { en:"it depends", es:"depende" },
+  { en:"I agree", es:"estoy de acuerdo" },
+  { en:"I disagree", es:"no estoy de acuerdo" },
+  { en:"in my opinion", es:"en mi opinión" },
+  { en:"from my perspective", es:"desde mi perspectiva" },
+  { en:"to be honest", es:"para ser sincero/a" },
+  { en:"to be honest (short)", es:"la verdad" },
+  { en:"I mean…", es:"o sea…" },
+  { en:"that is…", es:"es decir…" },
+  { en:"I don’t know", es:"no sé" },
+  { en:"I have no idea", es:"ni idea" },
 ];
 
 /* =========================
-   STATE
+   4) MASTER DECK (NO LIMITS)
    ========================= */
-let deck = [...NON_RULE_CARDS];   // <-- THIS is the correct deck variable
+const ALL_CARDS = [
+  ...CONJUGATION_CARDS,
+  ...IRREGULAR_VERB_CARDS,
+  ...NON_RULE_CARDS
+];
+
+/* =========================
+   APP STATE (NO LIMITS)
+   ========================= */
+let deck = [...ALL_CARDS];     // <-- all cards, never sliced
 let index = 0;
-let startSide = "EN";             // "EN" or "ES"
-let showingSpanish = false;       // current side
+let startSide = "EN";
+let showingSpanish = false;
 let audioOn = true;
 
 /* =========================
@@ -283,7 +795,7 @@ const startSideLabel = document.getElementById("startSideLabel");
 const audioLabel = document.getElementById("audioLabel");
 
 /* =========================
-   AUDIO (Quest may not support)
+   AUDIO (Quest may not support TTS)
    ========================= */
 function speak(text, lang) {
   if (!audioOn) return;
@@ -295,6 +807,16 @@ function speak(text, lang) {
     u.rate = 0.95;
     window.speechSynthesis.speak(u);
   } catch {}
+}
+
+/* =========================
+   SHUFFLE (Fisher–Yates)
+   ========================= */
+function shuffleInPlace(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
 }
 
 /* =========================
@@ -314,10 +836,10 @@ function render() {
 
   wordEl.textContent = text;
   labelEl.textContent = showingSpanish ? "Spanish" : "English";
+
   statusEl.textContent =
-    `Card ${index + 1} / ${deck.length} · Start: ${startSide} · Audio: ${
-      ("speechSynthesis" in window) ? (audioOn ? "ON" : "OFF") : "Not supported"
-    }`;
+    `Card ${index + 1} / ${deck.length} · Start: ${startSide} · ` +
+    `Audio: ${("speechSynthesis" in window) ? (audioOn ? "ON" : "OFF") : "Not supported on this browser"}`;
 
   speak(text, lang);
 }
@@ -329,36 +851,28 @@ function flipCard() {
   showingSpanish = !showingSpanish;
   render();
 }
-
 function nextCard() {
   index = (index + 1) % deck.length;
   showingSpanish = (startSide === "ES");
   render();
 }
-
 function prevCard() {
   index = (index - 1 + deck.length) % deck.length;
   showingSpanish = (startSide === "ES");
   render();
 }
-
 function shuffleDeck() {
-  for (let i = deck.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [deck[i], deck[j]] = [deck[j], deck[i]];
-  }
+  shuffleInPlace(deck);        // shuffle ONCE, pairs preserved
   index = 0;
   showingSpanish = (startSide === "ES");
   render();
 }
-
 function toggleStart() {
   startSide = (startSide === "EN") ? "ES" : "EN";
   startSideLabel.textContent = startSide;
   showingSpanish = (startSide === "ES");
   render();
 }
-
 function toggleAudio() {
   audioOn = !audioOn;
   audioLabel.textContent = audioOn ? "ON" : "OFF";
@@ -391,5 +905,7 @@ showingSpanish = (startSide === "ES");
 render();
 </script>
 
+</body>
+</html>
 </body>
 </html>
