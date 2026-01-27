@@ -164,10 +164,16 @@ const IRREGULAR_VERB_CARDS = [
   { en: "ir (present)", es: "voy, vas, va, vamos, vais, van" },
   { en: "tener (present)", es: "tengo, tienes, tiene, tenemos, tenéis, tienen" },
   { en: "hacer (present)", es: "hago, haces, hace, hacemos, hacéis, hacen" },
+  { en: "estar (present)", es: "estoy, estás, está, estamos, estáis, están" },
+  { en: "decir (present)", es: "digo, dices, dice, decimos, decís, dicen" },
+  { en: "venir (present)", es: "vengo, vienes, viene, venimos, venís, vienen" },
+  { en: "poder (present)", es: "puedo, puedes, puede, podemos, podéis, pueden" },
+  { en: "querer (present)", es: "quiero, quieres, quiere, queremos, queréis, quieren" },
 ];
 
 // 3) Your main vocab deck (keep ONLY {en, es} objects here)
 const NON_RULE_CARDS = [
+  // Core essentials you already had
   { en: "to be (essential)", es: "ser" },
   { en: "to be (temporary)", es: "estar" },
   { en: "to have", es: "tener" },
@@ -176,13 +182,295 @@ const NON_RULE_CARDS = [
   { en: "however", es: "sin embargo" },
   { en: "therefore", es: "por lo tanto" },
   { en: "in fact", es: "de hecho" },
-
-  // FIXED: missing comma example corrected here
   { en: "how much / many", es: "cuánto/a" },
   { en: "already", es: "ya" },
 
-  // Add the rest of your vocab here…
+  /* =========================
+     NEW: MUSIC VOCAB (your list)
+     ========================= */
+
+  // LA MÚSICA
+  { en: "the singer", es: "el/la cantante" },
+  { en: "the band", es: "la banda" },
+  { en: "music band", es: "el grupo de música" },
+  { en: "the orchestra", es: "la orquesta" },
+  { en: "the concert", es: "el concierto" },
+  { en: "the artist", es: "el/la artista" },
+  { en: "the performer", es: "el/la intérprete" },
+  { en: "the chorus (choir)", es: "el coro" },
+  { en: "soundtrack / score", es: "la banda sonora" },
+  { en: "melody", es: "la melodía" },
+  { en: "beat / measure", es: "el compás" },
+
+  // LAS ACCIONES (VERBOS)
+  { en: "to play (an instrument / a song)", es: "tocar" },
+  { en: "to listen (to a song)", es: "escuchar" },
+  { en: "to attend (a concert)", es: "asistir (a un concierto)" },
+  { en: "to hum (a song)", es: "tararear" },
+
+  // INSTRUMENTOS
+  { en: "guitar", es: "la guitarra" },
+  { en: "trumpet", es: "la trompeta" },
+  { en: "bass", es: "el bajo" },
+  { en: "drum kit", es: "la batería" },
+  { en: "piano", es: "el piano" },
+  { en: "timbales", es: "los timbales" },
+  { en: "violin", es: "el violín" },
+  { en: "conga drums", es: "las congas" },
+  { en: "harmonica", es: "la armónica" },
+  { en: "bongo drums", es: "los bongos" },
+  { en: "wind instruments", es: "instrumentos de viento" },
+  { en: "brass instruments", es: "instrumentos de metal" },
+  { en: "keyboard", es: "el teclado" },
+  { en: "string instruments", es: "instrumentos de cuerda" },
+  { en: "percussion", es: "la percusión" },
+
+  // LA CANCIÓN
+  { en: "lyrics", es: "la letra (de una canción)" },
+  { en: "stanza", es: "la estrofa" },
+  { en: "chorus (refrain)", es: "el estribillo" },
+  { en: "verses / lines", es: "los versos" },
+  { en: "poem", es: "el poema" },
+  { en: "rhyme", es: "la rima" },
+  { en: "rhythm", es: "el ritmo" },
+
+  // GÉNEROS MUSICALES
+  { en: "reggaeton", es: "el reguetón" },
+  { en: "salsa", es: "la salsa" },
+  { en: "corrido", es: "el corrido" },
+  { en: "merengue", es: "el merengue" },
+  { en: "bachata", es: "la bachata" },
+  { en: "flamenco", es: "el flamenco" },
+  { en: "milonga", es: "la milonga" },
+  { en: "tango", es: "el tango" },
+  { en: "rumba", es: "la rumba" },
+  { en: "bolero", es: "el bolero" },
+
+  // EXPRESIONES ÚTILES
+  { en: "What type of music do you like?", es: "¿Qué tipo de música te gusta?" },
+  { en: "Who is your favorite artist?", es: "¿Cuál es tu artista favorito?" },
+  { en: "Did you listen to the new song by ___?", es: "¿Escuchaste la nueva canción de ___?" },
+  { en: "What do you think of this song/artist?", es: "¿Qué te parece esta canción/cantante?" },
+
+  // NOTAS MUSICALES
+  { en: "musical notes (solfège)", es: "Do – Re – Mi – Fa – Sol – La – Si" },
+  { en: "musical notes (letters)", es: "C – D – E – F – G – A – B" },
+
+  // LAS EMOCIONES
+  { en: "nostalgia", es: "la nostalgia" },
+  { en: "pain", es: "el dolor" },
+  { en: "sadness", es: "la tristeza" },
+  { en: "anxiety", es: "la ansiedad" },
+  { en: "melancholy", es: "la melancolía" },
+  { en: "joy / happiness", es: "la alegría" },
+  { en: "love", es: "el amor" },
+  { en: "lust", es: "la lujuria" },
+  { en: "sexual attraction", es: "la atracción sexual" },
+  { en: "spite / heartbreak bitterness", es: "el despecho" },
+  { en: "jealousy", es: "los celos" },
+  { en: "envy", es: "la envidia" },
+
+  // Active vocab from Jorge Drexler text/video
+  { en: "wall", es: "el muro" },
+  { en: "dust", es: "el polvo" },
+  { en: "to bleed", es: "sangrar" },
+  { en: "stone", es: "la piedra" },
+  { en: "war", es: "la guerra" },
+  { en: "sad", es: "triste" },
+  { en: "to live together", es: "convivir" },
+  { en: "identity", es: "la identidad" },
+  { en: "flag", es: "la bandera" },
+  { en: "tradition", es: "la tradición" },
+  { en: "to kill", es: "matar" },
+  { en: "God", es: "Dios" },
+  { en: "doctrine", es: "la doctrina" },
+  { en: "chosen people", es: "el pueblo elegido" },
+
+  // Salsa / Reggaetón
+  { en: "rhythm", es: "ritmo" },
+  { en: "orchestra", es: "orquesta" },
+  { en: "borrowed", es: "prestado" },
+  { en: "Puerto Rican", es: "boricua" },
+
+  // Flamenco
+  { en: "clapping", es: "las palmas" },
+  { en: "daring", es: "osado" },
+  { en: "party", es: "la jarana" },
+
+  // Tango
+  { en: "machismo", es: "machismo" },
+  { en: "machist", es: "machista" },
+  { en: "pioneer", es: "la pionera" },
+  { en: "lit / fired up", es: "encendida" },
+  { en: "to worship", es: "adorar" },
+  { en: "aesthetics", es: "la estética" },
+
+  /* =========================
+     NEW: HIGH-FREQUENCY INTERMEDIATE SPANISH (core list)
+     (This is a curated "must-have" set for starting intermediate.)
+     ========================= */
+
+  // Function words & connectors
+  { en: "because", es: "porque" },
+  { en: "why?", es: "¿por qué?" },
+  { en: "so / therefore", es: "así que" },
+  { en: "although / even though", es: "aunque" },
+  { en: "however / nevertheless", es: "sin embargo" },
+  { en: "in addition", es: "además" },
+  { en: "also", es: "también" },
+  { en: "instead", es: "en lugar de" },
+  { en: "on the other hand", es: "por otro lado" },
+  { en: "for example", es: "por ejemplo" },
+  { en: "at least", es: "por lo menos" },
+  { en: "in general", es: "en general" },
+  { en: "in my opinion", es: "en mi opinión" },
+  { en: "maybe", es: "quizás / tal vez" },
+  { en: "probably", es: "probablemente" },
+  { en: "of course", es: "por supuesto" },
+  { en: "actually", es: "en realidad" },
+  { en: "especially", es: "especialmente" },
+  { en: "almost", es: "casi" },
+  { en: "enough", es: "suficiente" },
+  { en: "still / yet", es: "todavía" },
+  { en: "already", es: "ya" },
+  { en: "never", es: "nunca" },
+  { en: "always", es: "siempre" },
+  { en: "sometimes", es: "a veces" },
+  { en: "often", es: "a menudo" },
+  { en: "maybe / perhaps", es: "a lo mejor" },
+
+  // Time phrases
+  { en: "today", es: "hoy" },
+  { en: "yesterday", es: "ayer" },
+  { en: "tomorrow", es: "mañana" },
+  { en: "now", es: "ahora" },
+  { en: "later", es: "más tarde" },
+  { en: "before", es: "antes" },
+  { en: "after", es: "después" },
+  { en: "during", es: "durante" },
+  { en: "since (time)", es: "desde" },
+  { en: "until", es: "hasta" },
+  { en: "while", es: "mientras" },
+
+  // Core verbs (high frequency)
+  { en: "to do / to make", es: "hacer" },
+  { en: "to say / to tell", es: "decir" },
+  { en: "to speak", es: "hablar" },
+  { en: "to know (a fact)", es: "saber" },
+  { en: "to know (a person/place)", es: "conocer" },
+  { en: "to be able to / can", es: "poder" },
+  { en: "to want", es: "querer" },
+  { en: "to need", es: "necesitar" },
+  { en: "to think", es: "pensar" },
+  { en: "to believe", es: "creer" },
+  { en: "to feel", es: "sentir" },
+  { en: "to understand", es: "entender" },
+  { en: "to ask (a question)", es: "preguntar" },
+  { en: "to answer", es: "contestar" },
+  { en: "to give", es: "dar" },
+  { en: "to put / to place", es: "poner" },
+  { en: "to take", es: "tomar" },
+  { en: "to bring", es: "traer" },
+  { en: "to leave / to let", es: "dejar" },
+  { en: "to find", es: "encontrar" },
+  { en: "to try", es: "intentar" },
+  { en: "to use", es: "usar" },
+  { en: "to become", es: "convertirse en" },
+  { en: "to return", es: "volver" },
+  { en: "to happen", es: "pasar" },
+  { en: "to happen / occur", es: "ocurrir" },
+  { en: "to keep / maintain", es: "mantener" },
+  { en: "to follow", es: "seguir" },
+  { en: "to start", es: "empezar / comenzar" },
+  { en: "to finish", es: "terminar" },
+  { en: "to open", es: "abrir" },
+  { en: "to close", es: "cerrar" },
+  { en: "to read", es: "leer" },
+  { en: "to write", es: "escribir" },
+  { en: "to listen", es: "escuchar" },
+  { en: "to look at / watch", es: "mirar" },
+  { en: "to see", es: "ver" },
+
+  // Question starters
+  { en: "what?", es: "¿qué?" },
+  { en: "which?", es: "¿cuál?" },
+  { en: "who?", es: "¿quién?" },
+  { en: "where?", es: "¿dónde?" },
+  { en: "when?", es: "¿cuándo?" },
+  { en: "how?", es: "¿cómo?" },
+  { en: "how much?", es: "¿cuánto?" },
+
+  // Common nouns you’ll use constantly
+  { en: "thing", es: "la cosa" },
+  { en: "people", es: "la gente" },
+  { en: "place", es: "el lugar" },
+  { en: "time", es: "el tiempo" },
+  { en: "day", es: "el día" },
+  { en: "year", es: "el año" },
+  { en: "way / method", es: "la manera" },
+  { en: "problem", es: "el problema" },
+  { en: "question", es: "la pregunta" },
+  { en: "answer", es: "la respuesta" },
+  { en: "reason", es: "la razón" },
+  { en: "idea", es: "la idea" },
+  { en: "example", es: "el ejemplo" },
+  { en: "case", es: "el caso" },
+
+  // Polite classroom survival
+  { en: "I think that…", es: "pienso que…" },
+  { en: "I believe that…", es: "creo que…" },
+  { en: "I don’t know", es: "no sé" },
+  { en: "I don’t understand", es: "no entiendo" },
+  { en: "Can you repeat?", es: "¿puedes repetir?" },
+  { en: "more slowly, please", es: "más despacio, por favor" },
+  { en: "What does ___ mean?", es: "¿qué significa ___?" },
+  { en: "How do you say ___?", es: "¿cómo se dice ___?" },
+  { en: "Can you help me?", es: "¿me puedes ayudar?" },
+
+  /* =========================
+     NEW: LATIN/ENGLISH COGNATE ROOT CHANGES (quick pattern cards)
+     You asked for things like “-quence → -cuencia”.
+     These are pattern/transform cards to make cognates easier.
+     ========================= */
+
+  { en: "English -quence → Spanish -cuencia (e.g., frequency → frecuencia)", es: "-quence → -cuencia" },
+  { en: "English -tion → Spanish -ción (nation → nación)", es: "-tion → -ción" },
+  { en: "English -sion → Spanish -sión (decision → decisión)", es: "-sion → -sión" },
+  { en: "English -ity → Spanish -idad (activity → actividad)", es: "-ity → -idad" },
+  { en: "English -ous → Spanish -oso/a (curious → curioso)", es: "-ous → -oso/-osa" },
+  { en: "English -al → Spanish -al (natural → natural)", es: "-al → -al" },
+  { en: "English -ance/-ence → Spanish -ancia/-encia (difference → diferencia)", es: "-ance/-ence → -ancia/-encia" },
+  { en: "English -ary → Spanish -ario/a (necessary → necesario)", es: "-ary → -ario/-aria" },
+  { en: "English -ive → Spanish -ivo/a (creative → creativo)", es: "-ive → -ivo/-iva" },
+  { en: "English -ible/-able → Spanish -ible/-able (possible → posible)", es: "-ible/-able → -ible/-able" },
+  { en: "English -ph → Spanish -f (photo → foto)", es: "ph → f" },
+  { en: "English -th → Spanish -t (theory → teoría)", es: "th → t" },
+  { en: "English -ct → Spanish -t (action → acción; direct → directo)", es: "ct → t" },
+  { en: "English -mn → Spanish -n (column → columna)", es: "mn → n" },
+  { en: "English initial s+consonant → add e- (special → especial)", es: "sC- → esC-" },
+
+  // A few high-use cognates using those patterns (so it’s not just abstract)
+  { en: "frequency", es: "frecuencia" },
+  { en: "difference", es: "diferencia" },
+  { en: "importance", es: "importancia" },
+  { en: "experience", es: "experiencia" },
+  { en: "necessary", es: "necesario/a" },
+  { en: "possible", es: "posible" },
+  { en: "problem", es: "problema" },
+  { en: "information", es: "información" },
+  { en: "situation", es: "situación" },
+  { en: "condition", es: "condición" },
+  { en: "activity", es: "actividad" },
+  { en: "university", es: "universidad" },
+  { en: "attention", es: "atención" },
+  { en: "decision", es: "decisión" },
+  { en: "theory", es: "teoría" },
+  { en: "photo", es: "foto" },
+  { en: "special", es: "especial" },
 ];
+
+// If you later paste more vocab here, keep objects as {en, es}.
+// NOTE: Your list will now be much longer; the app will show the correct deck length.
 
 const ALL_CARDS = [
   ...CONJUGATION_CARDS,
@@ -324,3 +612,4 @@ render();
 
 </body>
 </html>
+
