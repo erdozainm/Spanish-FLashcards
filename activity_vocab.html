@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Spanish Activity Vocab — Flashcards</title>
+
+  <style>
+    :root { color-scheme: dark; }
+    body{
+      margin:0;
+      min-height:100vh;
+      background:#0b0b0b;
+      color:#f3f3f3;
+      font-family: system-ui, -apple-system, Helvetica, Arial, sans-serif;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding: 28px 18px;
+    }
+    .wrap{
+      width:min(92vw, 980px);
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+    }
+    header{
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+    h1{
+      margin:0;
+      font-size:1.35rem;
+      letter-spacing:0.2px;
+    }
+    .meta{
+      color:#b5b5b5;
+      font-size:0.95rem;
+    }
+    .card{
+      width:100%;
+      height:min(55vh, 480px);
+      background:#141414;
+      border-radius:28px;
+      box-shadow:0 20px 50px rgba(0,0,0,0.45);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+      padding:34px;
+      box-sizing:border-box;
+      cursor:pointer;
+      user-select:none;
+      position:relative;
+      overflow:hidden;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+    .card:active{ transform: translateY(1px); }
+    .big{
+      font-size: clamp(1.6rem, 3.6vw, 3.1rem);
+      line-height:1.12;
+      font-weight:650;
+      letter-spacing:0.2px;
+      word-break:break-word;
+    }
+    .sub{
+      margin-top:14px;
+      color:#a7a7a7;
+      font-size:0.98rem;
+    }
+    .controls{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      align-items:center;
+      justify-content:space-between;
+    }
+    .left, .right{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+    button, select{
+      background:#1a1a1a;
+      color:#f3f3f3;
+      border:1px solid rgba(255,255,255,0.10);
+      border-radius:14px;
+      padding:10px 12px;
+      font-size:0.98rem;
+      cursor:pointer;
+      transition: border-color 120ms ease, transform 120ms ease;
+    }
+    button:hover, select:hover{
+      border-color: rgba(255,255,255,0.22);
+    }
+    button:active{ transform: translateY(1px); }
+    .pill{
+      background:#101010;
+      border:1px solid rgba(255,255,255,0.10);
+      border-radius:999px;
+      padding:8px 12px;
+      color:#bdbdbd;
+      font-size:0.92rem;
+      white-space:nowrap;
+    }
+    .hint{
+      color:#9ca3af;
+      font-size:0.92rem;
+      margin:0;
+    }
+    .kbd{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size:0.86rem;
+      padding:2px 8px;
+      border-radius:8px;
+      border:1px solid rgba(255,255,255,0.14);
+      color:#d1d5db;
+    }
+    .toast{
+      position:fixed;
+      bottom:16px;
+      left:50%;
+      transform:translateX(-50%);
+      background:#101010;
+      border:1px solid rgba(255,255,255,0.10);
+      box-shadow:0 14px 40px rgba(0,0,0,0.55);
+      border-radius:999px;
+      padding:10px 14px;
+      color:#d1d5db;
+      font-size:0.95rem;
+      opacity:0;
+      pointer-events:none;
+      transition: opacity 180ms ease;
+    }
+    .toast.show{ opacity:1; }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <header>
+      <div>
+        <h1>Spanish Activity Vocab — Flashcards</h1>
+        <div class="meta">Click the card to flip • Use buttons or keys</div>
+      </div>
+      <div class="pill" id="progress">1 / 1</div>
+    </header>
+
+    <div class="card" id="card" role="button" aria-label="Flashcard (click to flip)">
+      <div>
+        <div class="big" id="cardText">—</div>
+        <div class="sub" id="cardSub">—</div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <div class="left">
+        <button id="prevBtn" title="Previous (←)">← Prev</button>
+        <button id="nextBtn" title="Next (→)">Next →</button>
+        <button id="shuffleBtn" title="Shuffle deck (S)">Shuffle</button>
+      </div>
+
+      <div class="right">
+        <label class="pill" style="display:flex; gap:10px; align-items:center;">
+          Start side:
+          <select id="startSide">
+            <option value="es">Spanish → English</option>
+            <option value="en">English → Spanish</option>
+          </select>
+        </label>
+        <button id="restartBtn" title="Restart from beginning (R)">Restart</button>
+      </div>
+    </div>
+
+    <p class="hint">
+      Shortcuts: <span class="kbd">Space</span> flip • <span class="kbd">←</span>/<span class="kbd">→</span> prev/next •
+      <span class="kbd">S</span> shuffle • <span class="kbd">R</span> restart
+    </p>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ✅ Edit/append here all semester:
+    // Each card: { es: "Spanish", en: "English" }
+    const baseCards = [
+      { es: "creo", en: "I believe / I think" },
+      { es: "sé", en: "I know" },
+      { es: "se vuelve", en: "it becomes" },
+      { es: "tan", en: "so (so much)" },
+      { es: "popular", en: "popular" },
+      { es: "últimos", en: "last / recent" },
+      { es: "debido a", en: "due to" },
+      { es: "aumenta", en: "it increases" },
+      { es: "la inmigración", en: "immigration" },
+      { es: "la frecuencia", en: "frequency" },
+      { es: "los matrimonios", en: "marriages" },
+      { es: "contribuye", en: "it contributes" },
+      { es: "la receptividad", en: "receptiveness" },
+      { es: "hacia", en: "toward" },
+      { es: "general", en: "general / overall" },
+      { es: "la disminución", en: "decrease / reduction" },
+      { es: "del racismo", en: "of racism" },
+      { es: "hace", en: "it makes / it does" },
+      { es: "sea", en: "(that it) is (subjunctive)" },
+      { es: "asimismo", en: "likewise / furthermore" },
+      { es: "presenta", en: "it presents" },
+      { es: "los grupos minoritarios", en: "minority groups" },
+      { es: "como", en: "like / as" },
+      { es: "algo “cool”", en: "something “cool”" },
+      { es: "lo cual", en: "which (referring to the whole idea)" },
+      { es: "gana", en: "it gains / it wins" },
+      { es: "aún", en: "even / still / yet" },
+      { es: "más popularidad", en: "more popularity" }
+    ];
+
+    let deck = [];
+    let idx = 0;
+    let showSide = "es"; // current visible side
+    let startSide = "es";
+    let flipped = false;
+
+    const elCard = document.getElementById("card");
+    const elText = document.getElementById("cardText");
+    const elSub  = document.getElementById("cardSub");
+    const elProgress = document.getElementById("progress");
+    const elStartSide = document.getElementById("startSide");
+    const elToast = document.getElementById("toast");
+
+    function toast(msg){
+      elToast.textContent = msg;
+      elToast.classList.add("show");
+      clearTimeout(toast._t);
+      toast._t = setTimeout(()=> elToast.classList.remove("show"), 1100);
+    }
+
+    function cloneDeck(){
+      deck = baseCards.map(c => ({...c}));
+    }
+
+    function shuffle(arr){
+      for(let i = arr.length - 1; i > 0; i--){
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    function updateProgress(){
+      elProgress.textContent = `${idx + 1} / ${deck.length}`;
+    }
+
+    function render(){
+      const card = deck[idx];
+      const front = startSide;               // the side you START on
+      const back  = front === "es" ? "en" : "es";
+
+      // If not flipped: show front; if flipped: show back
+      const visibleSide = flipped ? back : front;
+
+      elText.textContent = card[visibleSide];
+      elSub.textContent  = flipped ? (visibleSide === "es" ? "Spanish" : "English") : (front === "es" ? "Spanish" : "English");
+      updateProgress();
+    }
+
+    function flip(){
+      flipped = !flipped;
+      render();
+    }
+
+    function next(){
+      idx = (idx + 1) % deck.length;
+      flipped = false;
+      render();
+    }
+
+    function prev(){
+      idx = (idx - 1 + deck.length) % deck.length;
+      flipped = false;
+      render();
+    }
+
+    function restart(){
+      idx = 0;
+      flipped = false;
+      render();
+      toast("Restarted");
+    }
+
+    function reshuffle(){
+      deck = shuffle(deck);
+      idx = 0;
+      flipped = false;
+      render();
+      toast("Shuffled");
+    }
+
+    // Init
+    function init(){
+      cloneDeck();
+      if(deck.length === 0){
+        elText.textContent = "No cards yet.";
+        elSub.textContent = "Add cards in the baseCards array.";
+        elProgress.textContent = "0 / 0";
+        return;
+      }
+      startSide = elStartSide.value;
+      flipped = false;
+      idx = 0;
+      render();
+    }
+
+    // Events
+    elCard.addEventListener("click", flip);
+    document.getElementById("nextBtn").addEventListener("click", next);
+    document.getElementById("prevBtn").addEventListener("click", prev);
+    document.getElementById("shuffleBtn").addEventListener("click", reshuffle);
+    document.getElementById("restartBtn").addEventListener("click", restart);
+
+    elStartSide.addEventListener("change", (e) => {
+      startSide = e.target.value;
+      flipped = false;
+      render();
+      toast(startSide === "es" ? "Start: Spanish" : "Start: English");
+    });
+
+    // Keyboard shortcuts
+    document.addEventListener("keydown", (e) => {
+      if(e.key === " "){
+        e.preventDefault();
+        flip();
+      } else if(e.key === "ArrowRight"){
+        next();
+      } else if(e.key === "ArrowLeft"){
+        prev();
+      } else if(e.key.toLowerCase() === "s"){
+        reshuffle();
+      } else if(e.key.toLowerCase() === "r"){
+        restart();
+      }
+    });
+
+    init();
+  </script>
+</body>
+</html>
