@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Spanish Flashcards</title>
+<title>Spanish Flashcards — Daily Decks + Unknown Deck</title>
 
 <style>
   body {
@@ -16,6 +16,33 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    padding: 18px;
+  }
+
+  .topbar {
+    width: min(92vw, 900px);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+  }
+
+  .title {
+    font-size: 1.05rem;
+    opacity: 0.9;
+  }
+
+  select {
+    background: #1f1f1f;
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 14px;
+    padding: 10px 12px;
+    font-size: 0.95rem;
+    font-weight: 650;
+    cursor: pointer;
   }
 
   .card {
@@ -33,12 +60,14 @@
     box-sizing: border-box;
     user-select: none;
     border: 1px solid rgba(255,255,255,0.10);
+    position: relative;
   }
 
   .word {
-    font-size: clamp(2.2rem, 6vw, 5rem);
+    font-size: clamp(2.0rem, 5.6vw, 4.6rem);
     font-weight: 750;
     line-height: 1.15;
+    word-break: break-word;
   }
 
   .label {
@@ -47,8 +76,26 @@
     opacity: 0.75;
   }
 
+  .badge {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    padding: 8px 10px;
+    border-radius: 999px;
+    font-size: 0.9rem;
+    font-weight: 750;
+    display: none;
+    border: 1px solid rgba(255,255,255,0.12);
+    background: rgba(255,255,255,0.06);
+  }
+  .badge.show { display: inline-flex; }
+  .badge.unknown {
+    border-color: rgba(255,200,0,0.35);
+    background: rgba(255,200,0,0.12);
+  }
+
   .controls {
-    margin-top: 20px;
+    margin-top: 18px;
     display: flex;
     flex-wrap: wrap;
     gap: 12px;
@@ -65,21 +112,28 @@
     font-weight: 650;
     cursor: pointer;
   }
-
   button:hover { opacity: 0.9; }
 
+  button.unknownBtn {
+    border-color: rgba(255,200,0,0.35);
+  }
+  button.unknownBtn.active {
+    background: rgba(255,200,0,0.18);
+    border-color: rgba(255,200,0,0.55);
+  }
+
   .status {
-    margin-top: 14px;
+    margin-top: 12px;
     font-size: 0.9rem;
-    opacity: 0.8;
+    opacity: 0.82;
     text-align: center;
-    max-width: min(92vw, 900px);
+    width: min(92vw, 900px);
     line-height: 1.35;
   }
 
   .error {
     margin-top: 10px;
-    max-width: min(92vw, 900px);
+    width: min(92vw, 900px);
     padding: 10px 12px;
     border-radius: 12px;
     background: rgba(255,70,70,0.12);
@@ -100,10 +154,18 @@
 
 <body>
 
+<div class="topbar">
+  <div class="title">Spanish Flashcards — Daily Decks + “I Don’t Know” Deck</div>
+  <div>
+    <select id="deckSelect" title="Choose a deck"></select>
+  </div>
+</div>
+
 <div class="card" id="card" title="Click to flip">
+  <span class="badge unknown" id="unknownBadge">★ Unknown</span>
   <div>
     <div class="word" id="word">Loading…</div>
-    <div class="label" id="label">If stuck, check the error box below.</div>
+    <div class="label" id="label">Click to flip.</div>
   </div>
 </div>
 
@@ -112,13 +174,16 @@
   <button id="flipBtn">Flip</button>
   <button id="nextBtn">Next →</button>
   <button id="shuffleBtn">Shuffle</button>
+
   <button id="startBtn">Start: <span id="startSideLabel">EN</span></button>
   <button id="audioBtn">Audio: <span id="audioLabel">ON</span></button>
+
+  <button id="unknownBtn" class="unknownBtn" title="Mark this card as unknown">★ I don’t know</button>
 </div>
 
 <div class="status" id="status"></div>
 <div class="error" id="errorBox"></div>
-<div class="tiny">Keys: Space=Flip · ←/→ navigate</div>
+<div class="tiny">Keys: Space=Flip · ←/→ navigate · U=mark unknown · S=shuffle · E=start side</div>
 
 <script>
 /* =========================
@@ -133,384 +198,143 @@
 })();
 
 /* =========================
-   DECKS
+   DATA: DAILY DECKS
+   (Edit/add decks here)
    ========================= */
+const DECKS = {
+  "2026-01-28 — TODAY vocab (from PDF)": [
+    { en: "hybrid identities", es: "identidades híbridas" },
+    { en: "identity", es: "la identidad" },
+    { en: "traditional music", es: "la música tradicional" },
+    { en: "traditional musics", es: "las músicas tradicionales" },
+    { en: "milonga (genre/song)", es: "la milonga" },
+    { en: "stanza", es: "la estrofa" },
+    { en: "popular stanzas", es: "estrofas populares" },
 
-// 1) Conjugation endings
-const CONJUGATION_CARDS = [
-  { en: "-o, -as, -a, -amos, -áis, -an", es: "Present -AR" },
-  { en: "-o, -es, -e, -emos, -éis, -en", es: "Present -ER" },
-  { en: "-o, -es, -e, -imos, -ís, -en", es: "Present -IR" },
+    { en: "coaster (under a cup)", es: "el posavasos" },
+    { en: "décima (poetic form)", es: "la décima" },
+    { en: "a poem of ten lines", es: "un poema de diez versos" },
+    { en: "challenged (adj.)", es: "retado/a" },
+    { en: "from Madrid (adj.)", es: "matritense" },
 
-  { en: "-é, -aste, -ó, -amos, -asteis, -aron", es: "Preterite -AR (completed past)" },
-  { en: "-í, -iste, -ió, -imos, -isteis, -ieron", es: "Preterite -ER/-IR (completed past)" },
+    { en: "a TED talk", es: "una charla TED" },
+    { en: "to reflect (on)", es: "reflexionar (sobre)" },
+    { en: "to relate (to)", es: "relacionarse (con)" },
+    { en: "to write songs", es: "escribir canciones" },
 
-  { en: "-aba, -abas, -aba, -ábamos, -abais, -aban", es: "Imperfect -AR (habit/background)" },
-  { en: "-ía, -ías, -ía, -íamos, -íais, -ían", es: "Imperfect -ER/-IR (habit/background)" },
+    { en: "Uruguayan", es: "uruguayo/a" },
+    { en: "round", es: "redondo/a" },
+    { en: "bar", es: "el bar" },
+    { en: "to jot down / write down", es: "anotar" },
+    { en: "to add", es: "añadir" },
 
-  { en: "infinitive + -é, -ás, -á, -emos, -éis, -án", es: "Future (all verbs)" },
-  { en: "infinitive + -ía, -ías, -ía, -íamos, -íais, -ían", es: "Conditional (all verbs)" },
+    { en: "Jewish", es: "judío/judía" },
+    { en: "German", es: "alemán/alemana" },
+    { en: "to escape", es: "escapar" },
+    { en: "Nazi Germany", es: "la Alemania nazi" },
 
-  { en: "-e, -es, -e, -emos, -éis, -en", es: "Present Subjunctive -AR" },
-  { en: "-a, -as, -a, -amos, -áis, -an", es: "Present Subjunctive -ER/-IR" },
+    { en: "surgeon", es: "cirujano/a" },
+    { en: "profession", es: "la profesión" },
+    { en: "to leave behind", es: "dejar" },
+    { en: "to dedicate oneself to", es: "dedicarse a" },
 
-  { en: "-ra, -ras, -ra, -ramos, -rais, -ran", es: "Imperfect Subjunctive (-ra)" },
-  { en: "-se, -ses, -se, -semos, -seis, -sen", es: "Imperfect Subjunctive (-se)" },
-];
+    { en: "borrowed (adj.)", es: "prestado/a" },
+    { en: "to impact / to affect", es: "impactar" },
+    { en: "to confess", es: "confesar" },
 
-// 2) Irregular verbs (sample; add more as you like)
-const IRREGULAR_VERB_CARDS = [
-  { en: "ser (present)", es: "soy, eres, es, somos, sois, son" },
-  { en: "ir (present)", es: "voy, vas, va, vamos, vais, van" },
-  { en: "tener (present)", es: "tengo, tienes, tiene, tenemos, tenéis, tienen" },
-  { en: "hacer (present)", es: "hago, haces, hace, hacemos, hacéis, hacen" },
-  { en: "estar (present)", es: "estoy, estás, está, estamos, estáis, están" },
-  { en: "decir (present)", es: "digo, dices, dice, decimos, decís, dicen" },
-  { en: "venir (present)", es: "vengo, vienes, viene, venimos, venís, vienen" },
-  { en: "poder (present)", es: "puedo, puedes, puede, podemos, podéis, pueden" },
-  { en: "querer (present)", es: "quiero, quieres, quiere, queremos, queréis, quieren" },
-];
+    { en: "to realize", es: "darse cuenta (de)" },
+    { en: "true passion", es: "la verdadera pasión" },
+    { en: "to represent", es: "representar" },
+    { en: "a challenge", es: "un desafío" },
+    { en: "to accept", es: "aceptar" },
+    { en: "to impress", es: "impresionar" },
+    { en: "opportunity", es: "la oportunidad" },
+    { en: "to express", es: "expresar" },
+    { en: "feelings", es: "los sentimientos" },
+    { en: "to articulate", es: "articular" },
+    { en: "to highlight", es: "destacar" },
+    { en: "complexity", es: "la complejidad" },
+    { en: "humility", es: "la humildad" },
+    { en: "willingness to learn", es: "la disposición a aprender" },
 
-// 3) Your main vocab deck (keep ONLY {en, es} objects here)
-const NON_RULE_CARDS = [
-  // Core essentials you already had
-  { en: "to be (essential)", es: "ser" },
-  { en: "to be (temporary)", es: "estar" },
-  { en: "to have", es: "tener" },
-  { en: "to go", es: "ir" },
-  { en: "to come", es: "venir" },
-  { en: "however", es: "sin embargo" },
-  { en: "therefore", es: "por lo tanto" },
-  { en: "in fact", es: "de hecho" },
-  { en: "how much / many", es: "cuánto/a" },
-  { en: "already", es: "ya" },
+    { en: "conference / talk", es: "la conferencia" },
+    { en: "subtitles", es: "los subtítulos" },
+    { en: "to focus (on)", es: "centrarse (en)" },
+    { en: "to write down / note", es: "apuntar" },
+    { en: "new vocabulary", es: "el vocabulario nuevo" },
 
-  /* =========================
-     NEW: ACTIVITY VOCAB (your list)
-     Verbs are in present tense
-     ========================= */
+    { en: "history", es: "la historia" },
+    { en: "spread / diffusion", es: "la difusión" },
+    { en: "variety", es: "la variedad" },
+    { en: "names", es: "los nombres" },
+    { en: "evolution", es: "la evolución" },
+    { en: "adaptation", es: "la adaptación" },
+    { en: "local traditions", es: "las tradiciones locales" },
+    { en: "to demonstrate / show", es: "demostrar" },
+    { en: "to remain the same", es: "permanecer igual" },
+    { en: "structure", es: "la estructura" },
+    { en: "rhyme", es: "la rima" },
+    { en: "syllables", es: "las sílabas" },
+    { en: "listeners", es: "los oyentes" },
+    { en: "to concentrate", es: "concentrarse" },
+    { en: "meaning", es: "el significado" },
+    { en: "musicality", es: "la musicalidad" },
+    { en: "rhythm", es: "el ritmo" },
+    { en: "to appreciate", es: "apreciar" },
+    { en: "technical complexity", es: "la complejidad técnica" }
+  ],
 
-  { en: "I think / I believe", es: "creo" },
-  { en: "I know", es: "sé" },
-  { en: "it becomes / it turns into", es: "se vuelve" },
-  { en: "so / so much", es: "tan" },
-  { en: "popular", es: "popular" },
-  { en: "last / recent (plural)", es: "últimos" },
-  { en: "due to", es: "debido a" },
-  { en: "it increases", es: "aumenta" },
-  { en: "immigration", es: "la inmigración" },
-  { en: "frequency", es: "la frecuencia" },
-  { en: "marriages", es: "los matrimonios" },
-  { en: "it contributes", es: "contribuye" },
-  { en: "receptiveness / openness", es: "la receptividad" },
-  { en: "toward", es: "hacia" },
-  { en: "general / overall", es: "general" },
-  { en: "the decrease / the reduction", es: "la disminución" },
-  { en: "of racism", es: "del racismo" },
-  { en: "it makes / it does", es: "hace" },
-  { en: "(that it) is (present subjunctive)", es: "sea" },
-  { en: "likewise / furthermore", es: "asimismo" },
-  { en: "it presents", es: "presenta" },
-  { en: "minority groups", es: "los grupos minoritarios" },
-  { en: "like / as", es: "como" },
-  { en: "something “cool”", es: "algo “cool”" },
-  { en: "which (referring to the whole idea)", es: "lo cual" },
-  { en: "it gains / it earns", es: "gana" },
-  { en: "even / still / yet", es: "aún" },
-  { en: "more popularity", es: "más popularidad" },
+  "Template (EMPTY)": [
+    { en: "add new words here", es: "añade palabras nuevas aquí" }
+  ]
+};
 
-  /* =========================
-     NEW: MUSIC VOCAB (your list)
-     ========================= */
+/* =========================
+   UNKNOWN (“I don't know”) DECK (persisted)
+   ========================= */
+const UNKNOWN_DECK_KEY = "★ Unknown Deck (All 'I don’t know' cards)";
+const LS_UNKNOWN_SET = "spanishFlashcards_unknownSet_v1";   // stores { [cardId]: {en,es} }
+const LS_UNKNOWN_ORDER = "spanishFlashcards_unknownOrder_v1"; // stores [cardId,...] for stable order
 
-  // LA MÚSICA
-  { en: "the singer", es: "el/la cantante" },
-  { en: "the band", es: "la banda" },
-  { en: "music band", es: "el grupo de música" },
-  { en: "the orchestra", es: "la orquesta" },
-  { en: "the concert", es: "el concierto" },
-  { en: "the artist", es: "el/la artista" },
-  { en: "the performer", es: "el/la intérprete" },
-  { en: "the chorus (choir)", es: "el coro" },
-  { en: "soundtrack / score", es: "la banda sonora" },
-  { en: "melody", es: "la melodía" },
-  { en: "beat / measure", es: "el compás" },
+function safeJSONParse(s, fallback) {
+  try { return JSON.parse(s); } catch { return fallback; }
+}
 
-  // LAS ACCIONES (VERBOS)
-  { en: "to play (an instrument / a song)", es: "tocar" },
-  { en: "to listen (to a song)", es: "escuchar" },
-  { en: "to attend (a concert)", es: "asistir (a un concierto)" },
-  { en: "to hum (a song)", es: "tararear" },
+function loadUnknownState() {
+  const setObj = safeJSONParse(localStorage.getItem(LS_UNKNOWN_SET), {});
+  const order = safeJSONParse(localStorage.getItem(LS_UNKNOWN_ORDER), []);
+  // prune order if missing in setObj
+  const pruned = order.filter(id => setObj[id]);
+  if (pruned.length !== order.length) {
+    localStorage.setItem(LS_UNKNOWN_ORDER, JSON.stringify(pruned));
+  }
+  return { setObj, order: pruned };
+}
 
-  // INSTRUMENTOS
-  { en: "guitar", es: "la guitarra" },
-  { en: "trumpet", es: "la trompeta" },
-  { en: "bass", es: "el bajo" },
-  { en: "drum kit", es: "la batería" },
-  { en: "piano", es: "el piano" },
-  { en: "timbales", es: "los timbales" },
-  { en: "violin", es: "el violín" },
-  { en: "conga drums", es: "las congas" },
-  { en: "harmonica", es: "la armónica" },
-  { en: "bongo drums", es: "los bongos" },
-  { en: "wind instruments", es: "instrumentos de viento" },
-  { en: "brass instruments", es: "instrumentos de metal" },
-  { en: "keyboard", es: "el teclado" },
-  { en: "string instruments", es: "instrumentos de cuerda" },
-  { en: "percussion", es: "la percusión" },
+function saveUnknownState(setObj, order) {
+  localStorage.setItem(LS_UNKNOWN_SET, JSON.stringify(setObj));
+  localStorage.setItem(LS_UNKNOWN_ORDER, JSON.stringify(order));
+}
 
-  // LA CANCIÓN
-  { en: "lyrics", es: "la letra (de una canción)" },
-  { en: "stanza", es: "la estrofa" },
-  { en: "chorus (refrain)", es: "el estribillo" },
-  { en: "verses / lines", es: "los versos" },
-  { en: "poem", es: "el poema" },
-  { en: "rhyme", es: "la rima" },
-  { en: "rhythm", es: "el ritmo" },
+function cardId(card) {
+  // stable id across decks: ES|EN (lowercased, trimmed)
+  const es = (card.es || "").trim().toLowerCase();
+  const en = (card.en || "").trim().toLowerCase();
+  return `${es}|||${en}`;
+}
 
-  // GÉNEROS MUSICALES
-  { en: "reggaeton", es: "el reguetón" },
-  { en: "salsa", es: "la salsa" },
-  { en: "corrido", es: "el corrido" },
-  { en: "merengue", es: "el merengue" },
-  { en: "bachata", es: "la bachata" },
-  { en: "flamenco", es: "el flamenco" },
-  { en: "milonga", es: "la milonga" },
-  { en: "tango", es: "el tango" },
-  { en: "rumba", es: "la rumba" },
-  { en: "bolero", es: "el bolero" },
-
-  // EXPRESIONES ÚTILES
-  { en: "What type of music do you like?", es: "¿Qué tipo de música te gusta?" },
-  { en: "Who is your favorite artist?", es: "¿Cuál es tu artista favorito?" },
-  { en: "Did you listen to the new song by ___?", es: "¿Escuchaste la nueva canción de ___?" },
-  { en: "What do you think of this song/artist?", es: "¿Qué te parece esta canción/cantante?" },
-
-  // NOTAS MUSICALES
-  { en: "musical notes (solfège)", es: "Do – Re – Mi – Fa – Sol – La – Si" },
-  { en: "musical notes (letters)", es: "C – D – E – F – G – A – B" },
-
-  // LAS EMOCIONES
-  { en: "nostalgia", es: "la nostalgia" },
-  { en: "pain", es: "el dolor" },
-  { en: "sadness", es: "la tristeza" },
-  { en: "anxiety", es: "la ansiedad" },
-  { en: "melancholy", es: "la melancolía" },
-  { en: "joy / happiness", es: "la alegría" },
-  { en: "love", es: "el amor" },
-  { en: "lust", es: "la lujuria" },
-  { en: "sexual attraction", es: "la atracción sexual" },
-  { en: "spite / heartbreak bitterness", es: "el despecho" },
-  { en: "jealousy", es: "los celos" },
-  { en: "envy", es: "la envidia" },
-
-  // Active vocab from Jorge Drexler text/video
-  { en: "wall", es: "el muro" },
-  { en: "dust", es: "el polvo" },
-  { en: "to bleed", es: "sangrar" },
-  { en: "stone", es: "la piedra" },
-  { en: "war", es: "la guerra" },
-  { en: "sad", es: "triste" },
-  { en: "to live together", es: "convivir" },
-  { en: "identity", es: "la identidad" },
-  { en: "flag", es: "la bandera" },
-  { en: "tradition", es: "la tradición" },
-  { en: "to kill", es: "matar" },
-  { en: "God", es: "Dios" },
-  { en: "doctrine", es: "la doctrina" },
-  { en: "chosen people", es: "el pueblo elegido" },
-
-  // Salsa / Reggaetón
-  { en: "rhythm", es: "ritmo" },
-  { en: "orchestra", es: "orquesta" },
-  { en: "borrowed", es: "prestado" },
-  { en: "Puerto Rican", es: "boricua" },
-
-  // Flamenco
-  { en: "clapping", es: "las palmas" },
-  { en: "daring", es: "osado" },
-  { en: "party", es: "la jarana" },
-
-  // Tango
-  { en: "machismo", es: "machismo" },
-  { en: "machist", es: "machista" },
-  { en: "pioneer", es: "la pionera" },
-  { en: "lit / fired up", es: "encendida" },
-  { en: "to worship", es: "adorar" },
-  { en: "aesthetics", es: "la estética" },
-
-  /* =========================
-     NEW: HIGH-FREQUENCY INTERMEDIATE SPANISH (core list)
-     ========================= */
-
-  // Function words & connectors
-  { en: "because", es: "porque" },
-  { en: "why?", es: "¿por qué?" },
-  { en: "so / therefore", es: "así que" },
-  { en: "although / even though", es: "aunque" },
-  { en: "however / nevertheless", es: "sin embargo" },
-  { en: "in addition", es: "además" },
-  { en: "also", es: "también" },
-  { en: "instead", es: "en lugar de" },
-  { en: "on the other hand", es: "por otro lado" },
-  { en: "for example", es: "por ejemplo" },
-  { en: "at least", es: "por lo menos" },
-  { en: "in general", es: "en general" },
-  { en: "in my opinion", es: "en mi opinión" },
-  { en: "maybe", es: "quizás / tal vez" },
-  { en: "probably", es: "probablemente" },
-  { en: "of course", es: "por supuesto" },
-  { en: "actually", es: "en realidad" },
-  { en: "especially", es: "especialmente" },
-  { en: "almost", es: "casi" },
-  { en: "enough", es: "suficiente" },
-  { en: "still / yet", es: "todavía" },
-  { en: "already", es: "ya" },
-  { en: "never", es: "nunca" },
-  { en: "always", es: "siempre" },
-  { en: "sometimes", es: "a veces" },
-  { en: "often", es: "a menudo" },
-  { en: "maybe / perhaps", es: "a lo mejor" },
-
-  // Time phrases
-  { en: "today", es: "hoy" },
-  { en: "yesterday", es: "ayer" },
-  { en: "tomorrow", es: "mañana" },
-  { en: "now", es: "ahora" },
-  { en: "later", es: "más tarde" },
-  { en: "before", es: "antes" },
-  { en: "after", es: "después" },
-  { en: "during", es: "durante" },
-  { en: "since (time)", es: "desde" },
-  { en: "until", es: "hasta" },
-  { en: "while", es: "mientras" },
-
-  // Core verbs (high frequency)
-  { en: "to do / to make", es: "hacer" },
-  { en: "to say / to tell", es: "decir" },
-  { en: "to speak", es: "hablar" },
-  { en: "to know (a fact)", es: "saber" },
-  { en: "to know (a person/place)", es: "conocer" },
-  { en: "to be able to / can", es: "poder" },
-  { en: "to want", es: "querer" },
-  { en: "to need", es: "necesitar" },
-  { en: "to think", es: "pensar" },
-  { en: "to believe", es: "creer" },
-  { en: "to feel", es: "sentir" },
-  { en: "to understand", es: "entender" },
-  { en: "to ask (a question)", es: "preguntar" },
-  { en: "to answer", es: "contestar" },
-  { en: "to give", es: "dar" },
-  { en: "to put / to place", es: "poner" },
-  { en: "to take", es: "tomar" },
-  { en: "to bring", es: "traer" },
-  { en: "to leave / to let", es: "dejar" },
-  { en: "to find", es: "encontrar" },
-  { en: "to try", es: "intentar" },
-  { en: "to use", es: "usar" },
-  { en: "to become", es: "convertirse en" },
-  { en: "to return", es: "volver" },
-  { en: "to happen", es: "pasar" },
-  { en: "to happen / occur", es: "ocurrir" },
-  { en: "to keep / maintain", es: "mantener" },
-  { en: "to follow", es: "seguir" },
-  { en: "to start", es: "empezar / comenzar" },
-  { en: "to finish", es: "terminar" },
-  { en: "to open", es: "abrir" },
-  { en: "to close", es: "cerrar" },
-  { en: "to read", es: "leer" },
-  { en: "to write", es: "escribir" },
-  { en: "to listen", es: "escuchar" },
-  { en: "to look at / watch", es: "mirar" },
-  { en: "to see", es: "ver" },
-
-  // Question starters
-  { en: "what?", es: "¿qué?" },
-  { en: "which?", es: "¿cuál?" },
-  { en: "who?", es: "¿quién?" },
-  { en: "where?", es: "¿dónde?" },
-  { en: "when?", es: "¿cuándo?" },
-  { en: "how?", es: "¿cómo?" },
-  { en: "how much?", es: "¿cuánto?" },
-
-  // Common nouns you’ll use constantly
-  { en: "thing", es: "la cosa" },
-  { en: "people", es: "la gente" },
-  { en: "place", es: "el lugar" },
-  { en: "time", es: "el tiempo" },
-  { en: "day", es: "el día" },
-  { en: "year", es: "el año" },
-  { en: "way / method", es: "la manera" },
-  { en: "problem", es: "el problema" },
-  { en: "question", es: "la pregunta" },
-  { en: "answer", es: "la respuesta" },
-  { en: "reason", es: "la razón" },
-  { en: "idea", es: "la idea" },
-  { en: "example", es: "el ejemplo" },
-  { en: "case", es: "el caso" },
-
-  // Polite classroom survival
-  { en: "I think that…", es: "pienso que…" },
-  { en: "I believe that…", es: "creo que…" },
-  { en: "I don’t know", es: "no sé" },
-  { en: "I don’t understand", es: "no entiendo" },
-  { en: "Can you repeat?", es: "¿puedes repetir?" },
-  { en: "more slowly, please", es: "más despacio, por favor" },
-  { en: "What does ___ mean?", es: "¿qué significa ___?" },
-  { en: "How do you say ___?", es: "¿cómo se dice ___?" },
-  { en: "Can you help me?", es: "¿me puedes ayudar?" },
-
-  /* =========================
-     NEW: LATIN/ENGLISH COGNATE ROOT CHANGES (quick pattern cards)
-     ========================= */
-
-  { en: "English -quence → Spanish -cuencia (e.g., frequency → frecuencia)", es: "-quence → -cuencia" },
-  { en: "English -tion → Spanish -ción (nation → nación)", es: "-tion → -ción" },
-  { en: "English -sion → Spanish -sión (decision → decisión)", es: "-sion → -sión" },
-  { en: "English -ity → Spanish -idad (activity → actividad)", es: "-ity → -idad" },
-  { en: "English -ous → Spanish -oso/a (curious → curioso)", es: "-ous → -oso/-osa" },
-  { en: "English -al → Spanish -al (natural → natural)", es: "-al → -al" },
-  { en: "English -ance/-ence → Spanish -ancia/-encia (difference → diferencia)", es: "-ance/-ence → -ancia/-encia" },
-  { en: "English -ary → Spanish -ario/a (necessary → necesario)", es: "-ary → -ario/-aria" },
-  { en: "English -ive → Spanish -ivo/a (creative → creativo)", es: "-ive → -ivo/-iva" },
-  { en: "English -ible/-able → Spanish -ible/-able (possible → posible)", es: "-ible/-able → -ible/-able" },
-  { en: "English -ph → Spanish -f (photo → foto)", es: "ph → f" },
-  { en: "English -th → Spanish -t (theory → teoría)", es: "th → t" },
-  { en: "English -ct → Spanish -t (action → acción; direct → directo)", es: "ct → t" },
-  { en: "English -mn → Spanish -n (column → columna)", es: "mn → n" },
-  { en: "English initial s+consonant → add e- (special → especial)", es: "sC- → esC-" },
-
-  // A few high-use cognates using those patterns
-  { en: "frequency", es: "frecuencia" },
-  { en: "difference", es: "diferencia" },
-  { en: "importance", es: "importancia" },
-  { en: "experience", es: "experiencia" },
-  { en: "necessary", es: "necesario/a" },
-  { en: "possible", es: "posible" },
-  { en: "problem", es: "problema" },
-  { en: "information", es: "información" },
-  { en: "situation", es: "situación" },
-  { en: "condition", es: "condición" },
-  { en: "activity", es: "actividad" },
-  { en: "university", es: "universidad" },
-  { en: "attention", es: "atención" },
-  { en: "decision", es: "decisión" },
-  { en: "theory", es: "teoría" },
-  { en: "photo", es: "foto" },
-  { en: "special", es: "especial" },
-];
-
-const ALL_CARDS = [
-  ...CONJUGATION_CARDS,
-  ...IRREGULAR_VERB_CARDS,
-  ...NON_RULE_CARDS
-];
+function buildUnknownDeckFromStorage() {
+  const { setObj, order } = loadUnknownState();
+  return order.map(id => setObj[id]).filter(Boolean);
+}
 
 /* =========================
    APP STATE
    ========================= */
-let deck = [...ALL_CARDS];
+let deckKey = Object.keys(DECKS)[0];
+let deck = [...DECKS[deckKey]];
 let index = 0;
+
 let startSide = "EN";          // "EN" or "ES"
 let showingSpanish = false;    // current side showing
 let audioOn = true;
@@ -518,15 +342,18 @@ let audioOn = true;
 /* =========================
    ELEMENTS
    ========================= */
+const deckSelectEl = document.getElementById("deckSelect");
 const cardEl = document.getElementById("card");
 const wordEl = document.getElementById("word");
 const labelEl = document.getElementById("label");
 const statusEl = document.getElementById("status");
 const startSideLabel = document.getElementById("startSideLabel");
 const audioLabel = document.getElementById("audioLabel");
+const unknownBtn = document.getElementById("unknownBtn");
+const unknownBadge = document.getElementById("unknownBadge");
 
 /* =========================
-   AUDIO (browser dependent)
+   AUDIO
    ========================= */
 function speak(text, lang) {
   if (!audioOn) return;
@@ -541,7 +368,7 @@ function speak(text, lang) {
 }
 
 /* =========================
-   SHUFFLE (Fisher–Yates)
+   SHUFFLE
    ========================= */
 function shuffleInPlace(arr) {
   for (let i = arr.length - 1; i > 0; i--) {
@@ -551,13 +378,98 @@ function shuffleInPlace(arr) {
 }
 
 /* =========================
+   DECK LOADING
+   ========================= */
+function getAllDeckKeysWithUnknownFirst() {
+  const keys = Object.keys(DECKS);
+  return [UNKNOWN_DECK_KEY, ...keys];
+}
+
+function getDeckCardsByKey(key) {
+  if (key === UNKNOWN_DECK_KEY) return buildUnknownDeckFromStorage();
+  return [...(DECKS[key] || [])];
+}
+
+function loadDeck(newKey) {
+  deckKey = newKey;
+  deck = getDeckCardsByKey(deckKey);
+  index = 0;
+  showingSpanish = (startSide === "ES");
+  render();
+}
+
+/* =========================
+   UNKNOWN TOGGLE
+   ========================= */
+function currentCard() {
+  return deck[index];
+}
+
+function isCurrentCardUnknown() {
+  const c = currentCard();
+  if (!c) return false;
+  const id = cardId(c);
+  const { setObj } = loadUnknownState();
+  return Boolean(setObj[id]);
+}
+
+function setUnknownUI() {
+  const unknown = isCurrentCardUnknown();
+  unknownBtn.classList.toggle("active", unknown);
+  unknownBadge.classList.toggle("show", unknown);
+}
+
+function toggleUnknownForCurrentCard() {
+  const c = currentCard();
+  if (!c) return;
+
+  const id = cardId(c);
+  const state = loadUnknownState();
+  const setObj = state.setObj;
+  let order = state.order;
+
+  if (setObj[id]) {
+    // remove
+    delete setObj[id];
+    order = order.filter(x => x !== id);
+  } else {
+    // add
+    setObj[id] = { en: c.en, es: c.es };
+    if (!order.includes(id)) order.push(id);
+  }
+
+  saveUnknownState(setObj, order);
+
+  // If currently viewing the Unknown deck, refresh it (and keep index in bounds)
+  if (deckKey === UNKNOWN_DECK_KEY) {
+    const prevId = c ? cardId(c) : null;
+    deck = buildUnknownDeckFromStorage();
+    if (deck.length === 0) {
+      index = 0;
+    } else if (prevId) {
+      const newIdx = deck.findIndex(card => cardId(card) === prevId);
+      index = newIdx >= 0 ? newIdx : 0;
+    } else {
+      index = 0;
+    }
+  }
+
+  render();
+}
+
+/* =========================
    RENDER
    ========================= */
 function render() {
   if (!deck.length) {
-    wordEl.textContent = "No cards";
-    labelEl.textContent = "";
-    statusEl.textContent = "";
+    wordEl.textContent = (deckKey === UNKNOWN_DECK_KEY)
+      ? "No unknown cards yet"
+      : "No cards";
+    labelEl.textContent = (deckKey === UNKNOWN_DECK_KEY)
+      ? "Mark cards with ★ “I don’t know” to build this deck."
+      : "";
+    statusEl.textContent = `Deck: ${deckKey} · 0 cards`;
+    setUnknownUI();
     return;
   }
 
@@ -572,8 +484,14 @@ function render() {
     ? (audioOn ? "ON" : "OFF")
     : "Not supported";
 
-  statusEl.textContent = `Card ${index + 1} / ${deck.length} · Start: ${startSide} · Audio: ${audioStatus}`;
+  // unknown count
+  const { order } = loadUnknownState();
+  const unknownCount = order.length;
 
+  statusEl.textContent =
+    `Deck: ${deckKey} · Card ${index + 1}/${deck.length} · Unknown total: ${unknownCount} · Start: ${startSide} · Audio: ${audioStatus}`;
+
+  setUnknownUI();
   speak(text, lang);
 }
 
@@ -585,16 +503,19 @@ function flipCard() {
   render();
 }
 function nextCard() {
+  if (!deck.length) return;
   index = (index + 1) % deck.length;
   showingSpanish = (startSide === "ES");
   render();
 }
 function prevCard() {
+  if (!deck.length) return;
   index = (index - 1 + deck.length) % deck.length;
   showingSpanish = (startSide === "ES");
   render();
 }
 function shuffleDeck() {
+  if (!deck.length) return;
   shuffleInPlace(deck);
   index = 0;
   showingSpanish = (startSide === "ES");
@@ -621,22 +542,49 @@ document.getElementById("nextBtn").addEventListener("click", nextCard);
 document.getElementById("shuffleBtn").addEventListener("click", shuffleDeck);
 document.getElementById("startBtn").addEventListener("click", toggleStart);
 document.getElementById("audioBtn").addEventListener("click", toggleAudio);
+unknownBtn.addEventListener("click", toggleUnknownForCurrentCard);
 cardEl.addEventListener("click", flipCard);
 
 document.addEventListener("keydown", (e) => {
+  const k = e.key.toLowerCase();
   if (e.code === "Space") { e.preventDefault(); flipCard(); }
-  if (e.key === "ArrowRight") nextCard();
-  if (e.key === "ArrowLeft") prevCard();
+  else if (e.key === "ArrowRight") nextCard();
+  else if (e.key === "ArrowLeft") prevCard();
+  else if (k === "s") shuffleDeck();
+  else if (k === "u") toggleUnknownForCurrentCard();
+  else if (k === "e") toggleStart();
 });
 
 /* =========================
    INIT
    ========================= */
-startSideLabel.textContent = startSide;
-audioLabel.textContent = audioOn ? "ON" : "OFF";
-showingSpanish = (startSide === "ES");
-render();
+function init() {
+  // Populate deck dropdown with Unknown deck + daily decks
+  deckSelectEl.innerHTML = "";
+  getAllDeckKeysWithUnknownFirst().forEach((k) => {
+    const opt = document.createElement("option");
+    opt.value = k;
+    opt.textContent = k;
+    deckSelectEl.appendChild(opt);
+  });
+
+  // Default: today deck (not Unknown) unless you want Unknown first
+  deckKey = Object.keys(DECKS)[0];
+  deckSelectEl.value = deckKey;
+
+  deckSelectEl.addEventListener("change", (e) => loadDeck(e.target.value));
+
+  startSideLabel.textContent = startSide;
+  audioLabel.textContent = audioOn ? "ON" : "OFF";
+  showingSpanish = (startSide === "ES");
+
+  deck = getDeckCardsByKey(deckKey);
+  render();
+}
+
+init();
 </script>
 
 </body>
 </html>
+
