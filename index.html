@@ -3,162 +3,63 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Spanish Flashcards — Daily Decks + Unknown Deck</title>
-
+<title>Spanish Flashcards — SPA103 POS Decks + Unknown</title>
 <style>
   body {
-    margin: 0;
-    min-height: 100vh;
-    background: #0b0b0b;
-    color: #f3f3f3;
+    margin: 0; min-height: 100vh; background: #0b0b0b; color: #f3f3f3;
     font-family: system-ui, -apple-system, Helvetica, Arial, sans-serif;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 18px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 18px;
   }
-
   .topbar {
-    width: min(92vw, 900px);
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 14px;
+    width: min(92vw, 900px); display: flex; flex-wrap: wrap; gap: 10px;
+    justify-content: space-between; align-items: center; margin-bottom: 14px;
   }
-
-  .title {
-    font-size: 1.05rem;
-    opacity: 0.9;
-  }
-
+  .title { font-size: 1.02rem; opacity: 0.9; }
   select {
-    background: #1f1f1f;
-    color: #fff;
-    border: 1px solid rgba(255,255,255,0.15);
-    border-radius: 14px;
-    padding: 10px 12px;
-    font-size: 0.95rem;
-    font-weight: 650;
-    cursor: pointer;
+    background: #1f1f1f; color: #fff; border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 14px; padding: 10px 12px; font-size: 0.95rem; font-weight: 650; cursor: pointer;
   }
-
   .card {
-    width: min(92vw, 900px);
-    height: min(55vh, 460px);
-    background: #141414;
-    border-radius: 28px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    cursor: pointer;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.45);
-    padding: 32px;
-    box-sizing: border-box;
-    user-select: none;
-    border: 1px solid rgba(255,255,255,0.10);
-    position: relative;
+    width: min(92vw, 900px); height: min(55vh, 460px); background: #141414; border-radius: 28px;
+    display: flex; align-items: center; justify-content: center; text-align: center; cursor: pointer;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.45); padding: 32px; box-sizing: border-box; user-select: none;
+    border: 1px solid rgba(255,255,255,0.10); position: relative;
   }
-
-  .word {
-    font-size: clamp(2.0rem, 5.6vw, 4.6rem);
-    font-weight: 750;
-    line-height: 1.15;
-    word-break: break-word;
-  }
-
-  .label {
-    margin-top: 12px;
-    font-size: 0.95rem;
-    opacity: 0.75;
-  }
-
+  .word { font-size: clamp(2.0rem, 5.6vw, 4.6rem); font-weight: 750; line-height: 1.15; word-break: break-word; }
+  .label { margin-top: 12px; font-size: 0.95rem; opacity: 0.75; }
   .badge {
-    position: absolute;
-    top: 14px;
-    right: 14px;
-    padding: 8px 10px;
-    border-radius: 999px;
-    font-size: 0.9rem;
-    font-weight: 750;
-    display: none;
-    border: 1px solid rgba(255,255,255,0.12);
+    position: absolute; top: 14px; right: 14px; padding: 8px 10px; border-radius: 999px;
+    font-size: 0.9rem; font-weight: 750; display: none; border: 1px solid rgba(255,255,255,0.12);
     background: rgba(255,255,255,0.06);
   }
   .badge.show { display: inline-flex; }
-  .badge.unknown {
-    border-color: rgba(255,200,0,0.35);
-    background: rgba(255,200,0,0.12);
-  }
-
+  .badge.unknown { border-color: rgba(255,200,0,0.35); background: rgba(255,200,0,0.12); }
   .controls {
-    margin-top: 18px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-    justify-content: center;
+    margin-top: 18px; display: flex; flex-wrap: wrap; gap: 12px; justify-content: center;
   }
-
   button {
-    background: #1f1f1f;
-    color: #fff;
-    border: 1px solid rgba(255,255,255,0.15);
-    border-radius: 14px;
-    padding: 12px 18px;
-    font-size: 1rem;
-    font-weight: 650;
-    cursor: pointer;
+    background: #1f1f1f; color: #fff; border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 14px; padding: 12px 18px; font-size: 1rem; font-weight: 650; cursor: pointer;
   }
   button:hover { opacity: 0.9; }
-
-  button.unknownBtn {
-    border-color: rgba(255,200,0,0.35);
-  }
-  button.unknownBtn.active {
-    background: rgba(255,200,0,0.18);
-    border-color: rgba(255,200,0,0.55);
-  }
-
+  button.unknownBtn { border-color: rgba(255,200,0,0.35); }
+  button.unknownBtn.active { background: rgba(255,200,0,0.18); border-color: rgba(255,200,0,0.55); }
   .status {
-    margin-top: 12px;
-    font-size: 0.9rem;
-    opacity: 0.82;
-    text-align: center;
-    width: min(92vw, 900px);
-    line-height: 1.35;
+    margin-top: 12px; font-size: 0.9rem; opacity: 0.82; text-align: center; width: min(92vw, 900px); line-height: 1.35;
   }
-
   .error {
-    margin-top: 10px;
-    width: min(92vw, 900px);
-    padding: 10px 12px;
-    border-radius: 12px;
-    background: rgba(255,70,70,0.12);
-    border: 1px solid rgba(255,70,70,0.35);
-    display: none;
-    white-space: pre-wrap;
-    font-size: 0.95rem;
+    margin-top: 10px; width: min(92vw, 900px); padding: 10px 12px; border-radius: 12px;
+    background: rgba(255,70,70,0.12); border: 1px solid rgba(255,70,70,0.35); display: none;
+    white-space: pre-wrap; font-size: 0.95rem;
   }
-
-  .tiny {
-    margin-top: 10px;
-    opacity: 0.65;
-    font-size: 0.9rem;
-    text-align: center;
-  }
+  .tiny { margin-top: 10px; opacity: 0.65; font-size: 0.9rem; text-align: center; }
 </style>
 </head>
-
 <body>
 
 <div class="topbar">
-  <div class="title">Spanish Flashcards — Daily Decks + “I Don’t Know” Deck</div>
-  <div>
-    <select id="deckSelect" title="Choose a deck"></select>
-  </div>
+  <div class="title">Spanish Flashcards — SPA103 (POS Decks) + Unknown Deck</div>
+  <div><select id="deckSelect" title="Choose a deck"></select></div>
 </div>
 
 <div class="card" id="card" title="Click to flip">
@@ -174,21 +75,16 @@
   <button id="flipBtn">Flip</button>
   <button id="nextBtn">Next →</button>
   <button id="shuffleBtn">Shuffle</button>
-
   <button id="startBtn">Start: <span id="startSideLabel">EN</span></button>
   <button id="audioBtn">Audio: <span id="audioLabel">ON</span></button>
-
   <button id="unknownBtn" class="unknownBtn" title="Mark this card as unknown">★ I don’t know</button>
 </div>
 
 <div class="status" id="status"></div>
 <div class="error" id="errorBox"></div>
-<div class="tiny">Keys: Space=Flip · ←/→ navigate · U=mark unknown · S=shuffle · E=start side</div>
+<div class="tiny">Keys: Space=Flip · ←/→ navigate · U=unknown · S=shuffle · E=start side</div>
 
 <script>
-/* =========================
-   SHOW JS ERRORS ON PAGE
-   ========================= */
 (function () {
   const errorBox = document.getElementById("errorBox");
   window.addEventListener("error", (e) => {
@@ -197,151 +93,96 @@
   });
 })();
 
-/* =========================
-   DATA: DAILY DECKS
-   (Edit/add decks here)
-   ========================= */
-const DECKS = {
-  "2026-01-28 — TODAY vocab (from PDF)": [
-    { en: "hybrid identities", es: "identidades híbridas" },
-    { en: "identity", es: "la identidad" },
-    { en: "traditional music", es: "la música tradicional" },
-    { en: "traditional musics", es: "las músicas tradicionales" },
-    { en: "milonga (genre/song)", es: "la milonga" },
-    { en: "stanza", es: "la estrofa" },
-    { en: "popular stanzas", es: "estrofas populares" },
+const DECKS = {"SPA 103 — Verbs": [{"es": "abrir", "en": "to open"}, {"es": "aprender (a + infinitive)", "en": "to learn to + infinitive"}, {"es": "asistir (a)", "en": "to attend"}, {"es": "beber", "en": "to drink"}, {"es": "buscar", "en": "to look for / to seek"}, {"es": "cantar", "en": "to sing"}, {"es": "comer", "en": "to eat"}, {"es": "comprar", "en": "to buy"}, {"es": "comprender", "en": "to understand"}, {"es": "cuidar (a alguien)", "en": "to take care of (someone)"}, {"es": "deber (+ infinitive)", "en": "ought to/ should"}, {"es": "empezar", "en": "to start"}, {"es": "enseñar", "en": "to teach"}, {"es": "escuchar", "en": "to listen (to)"}, {"es": "haber (hay)", "en": "There is/there are"}, {"es": "hacer", "en": "to do, to make"}, {"es": "hablar", "en": "to speak"}, {"es": "leer", "en": "to read"}, {"es": "llamar", "en": "to call"}, {"es": "llegar (a/al tiempo)", "en": "to arrive (on time)"}, {"es": "llevar (algo/ a alguien)", "en": "to take, to carry (something / someone)"}, {"es": "mirar", "en": "to look"}, {"es": "pasar el tiempo", "en": "to spend time"}, {"es": "participar", "en": "to participate"}, {"es": "practicar", "en": "to practice"}, {"es": "regresar (a casa)", "en": "to return (home)"}, {"es": "repasar", "en": "to review"}, {"es": "sacar buenas/malas notas", "en": "to get good/ bad grades"}, {"es": "salir", "en": "to leave"}, {"es": "tener", "en": "to have/ to possess"}, {"es": "terminar", "en": "to end"}, {"es": "tomar apuntes/notas", "en": "to take notes"}, {"es": "trabajar", "en": "to work"}, {"es": "usar", "en": "to use"}, {"es": "vivir", "en": "to live"}, {"es": "andar/caminar", "en": "to walk"}, {"es": "bailar", "en": "to dance"}, {"es": "cocinar", "en": "to cook"}, {"es": "correr", "en": "to go running"}, {"es": "descansar", "en": "to rest"}, {"es": "echar una siesta", "en": "to take a nap"}, {"es": "escribir", "en": "to write"}, {"es": "estudiar", "en": "to study"}, {"es": "jugar", "en": "to play"}, {"es": "nadar", "en": "to swim"}, {"es": "pasear", "en": "to go for a ride/ a stroll"}, {"es": "tocar (la guitarra, el piano, etc.)", "en": "to play (guitar, piano, etc.)"}, {"es": "tomar algo", "en": "to have something to drink"}, {"es": "viajar", "en": "to travel"}, {"es": "compartir", "en": "to share"}, {"es": "comportarse (bien, mal)", "en": "to behave (well, badly)"}, {"es": "conocer a alguien", "en": "to know somebody"}, {"es": "saber algo", "en": "to know something (e.g., a fact)"}, {"es": "salir con amigos", "en": "to hang out with friends"}, {"es": "tener frío", "en": "to be cold"}, {"es": "tener calor", "en": "to be hot"}, {"es": "tener XX años", "en": "to be XX years old"}, {"es": "tener miedo", "en": "to be afraid"}, {"es": "tener prisa", "en": "to be in a hurry"}, {"es": "tener razón", "en": "to be right"}, {"es": "tener sueño", "en": "to be (feel) sleepy"}, {"es": "tener cuidado", "en": "to be careful"}, {"es": "tener suerte", "en": "to be lucky"}, {"es": "tener hambre", "en": "to be hungry"}, {"es": "tener sed", "en": "to be thirsty"}, {"es": "tener ganas de (infinitive)", "en": "to feel like doing something"}, {"es": "tener paciencia", "en": "to be patient"}, {"es": "llover", "en": "to rain"}, {"es": "nevar", "en": "to snow"}, {"es": "barrer el piso", "en": "to sweep the floor"}, {"es": "poner la mesa", "en": "to set the table"}, {"es": "hacer la cama", "en": "to make the bed"}, {"es": "lavar / fregar (los platos)", "en": "to wash (the dishes)"}, {"es": "limpiar la casa (entera)", "en": "to clean the (whole) house"}, {"es": "pasar la aspiradora", "en": "to vacuum"}, {"es": "quitar el polvo", "en": "to dust"}, {"es": "sacar la basura", "en": "to take out the trash"}, {"es": "cenar", "en": "to have dinner"}, {"es": "desayunar", "en": "to have breakfast"}, {"es": "(pagar) en efectivo.", "en": "(to pay) in cash."}, {"es": "buscar", "en": "to look for"}, {"es": "cambiar", "en": "to change"}, {"es": "cerrar", "en": "to close"}, {"es": "costar", "en": "to cost"}, {"es": "encontrar", "en": "to find"}, {"es": "entrar", "en": "to get into/ enter"}, {"es": "gastar", "en": "to spend"}, {"es": "gustar", "en": "to like"}, {"es": "llevar", "en": "to wear/to take"}, {"es": "mostrar", "en": "to show"}, {"es": "ofrecer", "en": "to offer"}, {"es": "pagar", "en": "to pay"}, {"es": "ponerse", "en": "to put on"}, {"es": "probarse", "en": "to try on"}, {"es": "quedar", "en": "to fit"}, {"es": "vender", "en": "to sell"}, {"es": "acostarse (ue)", "en": "to go to bed"}, {"es": "arreglarse", "en": "to fix oneself up, to get ready"}, {"es": "bañarse", "en": "to bathe to take a bath"}, {"es": "cepillarse", "en": "to brush"}, {"es": "despertarse (ie)", "en": "to wake up"}, {"es": "divertirse (ie)", "en": "to have fun"}, {"es": "dormirse (ue)", "en": "to fall asleep"}, {"es": "ducharse", "en": "to shower oneself"}, {"es": "lavarse", "en": "to wash oneself"}, {"es": "levantarse", "en": "to get up"}, {"es": "peinarse", "en": "to comb or style one’s hair"}, {"es": "ponerse (la ropa)", "en": "to put on (clothing)"}, {"es": "quedarse (en casa)", "en": "to stay (at home)"}, {"es": "quitarse (la ropa)", "en": "to take off (clothing)"}, {"es": "secarse", "en": "to dry onself"}, {"es": "sentarse (ie)", "en": "to sit down"}, {"es": "asumir el poder", "en": "take power"}, {"es": "tener éxito", "en": "to succeed"}, {"es": "silenciar", "en": "to silence"}, {"es": "traicionar", "en": "to betray"}, {"es": "fracasar", "en": "fail"}, {"es": "tener lugar", "en": "to take place"}, {"es": "celebrar", "en": "to celebrate"}, {"es": "brindar (por)", "en": "to have a toast"}, {"es": "cumplir (años)", "en": "to turn (age)"}, {"es": "hacer un brindis (por)", "en": "to have a toast"}, {"es": "disfrazarse", "en": "to dress up"}, {"es": "relajarse", "en": "to relax"}, {"es": "sorprender (a)", "en": "to surprise"}, {"es": "nacer", "en": "to be born"}, {"es": "crecer", "en": "to grow (up)"}, {"es": "criar(se)", "en": "to raise"}, {"es": "enamorarse (de)", "en": "to fall in love"}, {"es": "romper/terminar (con)", "en": "to break up"}, {"es": "casarse (con)", "en": "to get married"}, {"es": "divorciarse (de)", "en": "to get divorced"}, {"es": "graduarse (de)", "en": "to graduate"}, {"es": "salir (con)", "en": "to go out with (sb)"}, {"es": "tener/alcanzar éxito", "en": "to be successful"}, {"es": "fracasar", "en": "to fail"}, {"es": "solicitar (empleo/ en una universidad)", "en": "to apply"}, {"es": "conseguir (trabajo)", "en": "to find/to achieve"}, {"es": "mudarse", "en": "to move"}, {"es": "jubilarse", "en": "to retire"}, {"es": "morir/fallecer", "en": "to die"}, {"es": "darse cuenta de...", "en": "to realize"}, {"es": "castigar", "en": "to punish"}, {"es": "engañar/traicionar", "en": "to mislead/cheat/betray"}, {"es": "lamentar", "en": "to regret"}, {"es": "manejar (bien/mal)", "en": "to manage (well/poorly)"}, {"es": "conservar", "en": "to conserve"}, {"es": "contaminar", "en": "to contaminate"}, {"es": "ahorrar", "en": "to save"}, {"es": "desperdiciar", "en": "to waste"}, {"es": "dejar de", "en": "to stop"}, {"es": "echar/tirar/botar", "en": "to throw out"}, {"es": "proteger", "en": "to protect"}, {"es": "reducir", "en": "to reduce"}, {"es": "reusar", "en": "to reuse"}, {"es": "reciclar", "en": "to recycle"}, {"es": "entrevistar", "en": "to interview"}, {"es": "censurar (algo/ a alguien)", "en": "to censor"}, {"es": "examinar", "en": "to examine"}, {"es": "cortar(se)", "en": "to cut (oneself)"}, {"es": "lastimar(se)", "en": "to hurt (oneself)"}, {"es": "doler", "en": "to hurt, to ache"}, {"es": "enfermarse", "en": "to get sick"}, {"es": "estar enfermo/a", "en": "to be sick"}, {"es": "estornudar", "en": "to sneeze"}, {"es": "hacer gárgaras", "en": "to gargle"}, {"es": "respirar", "en": "to breathe"}, {"es": "tener escalofríos", "en": "to have the chills"}, {"es": "tener fiebre", "en": "to have a fever"}, {"es": "tener gripe", "en": "to have the flu"}, {"es": "tener mareos", "en": "to feel dizzy"}, {"es": "tener migraña", "en": "to have a migraine"}, {"es": "tener la nariz tapada", "en": "to have a stuffy nose"}, {"es": "tener náuseas", "en": "to feel nauseous"}, {"es": "tener tos", "en": "to have a cough"}, {"es": "tener un resfriado", "en": "to have a cold"}, {"es": "torcerse (el tobillo, etc)", "en": "to twist"}, {"es": "romperse (un hueso)", "en": "to break (a bone)"}, {"es": "apoyar", "en": "to support"}, {"es": "aprobar", "en": "to approve, to pass"}, {"es": "defender", "en": "to defend"}, {"es": "discutir", "en": "to argue, to discuss"}, {"es": "elegir", "en": "to elect"}, {"es": "gobernar", "en": "to govern"}, {"es": "votar", "en": "to vote"}, {"es": "apagar", "en": "to turn off"}, {"es": "(des)conectar", "en": "to (dis)connect"}, {"es": "(des)enchufar", "en": "to (un)plug"}, {"es": "encender", "en": "to turn on"}, {"es": "(re)cargar", "en": "to (re)charge"}, {"es": "prender", "en": "to turn on"}, {"es": "funcionar", "en": "to function, to work"}, {"es": "grabar", "en": "to record"}, {"es": "abrir un documento (un programa)", "en": "to open a document (program)"}, {"es": "cerrar un documento (un programa)", "en": "to close a document (program)"}, {"es": "guardar", "en": "to save"}, {"es": "hacer clic", "en": "to click"}, {"es": "publicar", "en": "to publish"}, {"es": "tuitear", "en": "to tweet"}, {"es": "quedarse", "en": "to stay"}, {"es": "parecerse a", "en": "to resemble"}, {"es": "ponerse + adj.", "en": "to become + adjective"}, {"es": "aburrirse", "en": "to get bored"}, {"es": "alegrarse", "en": "to become happy"}, {"es": "cansarse", "en": "to get tired"}, {"es": "confundirse", "en": "to become confused"}, {"es": "deprimirse", "en": "to become depressed"}, {"es": "divertirse", "en": "to get/have fun"}, {"es": "frustrarse", "en": "to become frustrated"}, {"es": "irritarse", "en": "to become irritated"}, {"es": "ofenderse", "en": "to get offended"}, {"es": "preocuparse", "en": "to become worried"}, {"es": "sentirse", "en": "to feel (a feeling)"}, {"es": "caer bien (mal) a alguien", "en": "to like/dislike someone (to strike someone"}, {"es": "disgustar", "en": "to hate something"}, {"es": "encantar", "en": "to \"love\" something"}, {"es": "fascinar", "en": "to be fascinated by"}, {"es": "hacer falta", "en": "to need, to be lacking, to be necessary"}, {"es": "importar", "en": "to be important, to matter"}, {"es": "interesar", "en": "to interest, to be interesting"}, {"es": "molestar", "en": "to bother"}, {"es": "parecer", "en": "to seem (like)"}, {"es": "ofrecerse como voluntario", "en": "to volunteer"}, {"es": "colaborar", "en": "to colaborate"}, {"es": "contar con (los demás)", "en": "to rely on (others)"}, {"es": "donar", "en": "to donate"}, {"es": "recaudar fondos", "en": "to fundraise"}, {"es": "comprometerse (con una causa)", "en": "to undertake/ to engage in"}, {"es": "crear/ despertar conciencia", "en": "to raise awareness"}, {"es": "estar a favor de", "en": "to be for (something)"}, {"es": "estar en contra de", "en": "to be against (something)"}, {"es": "involucrarse", "en": "to be/ get involved (in)"}, {"es": "mejorar", "en": "to improve"}, {"es": "superar(se)", "en": "to overcome/ to better oneself"}, {"es": "parar (algo)", "en": "to stop (something)"}, {"es": "aterrizar", "en": "to land"}, {"es": "deshacer la(s) maleta(s)", "en": "to unpack"}, {"es": "despegar", "en": "to take off"}, {"es": "facturar la(s) maleta(s)", "en": "to check luggage"}, {"es": "hacer la(s) maleta(s)", "en": "to pack"}, {"es": "solicitar una visa", "en": "to apply for a visa"}, {"es": "inmigrar", "en": "immigrate"}, {"es": "emigrar", "en": "emigrate"}, {"es": "cruzar", "en": "to cross"}, {"es": "asimilar", "en": "to assimilate"}, {"es": "despedirse de", "en": "to say goodbye"}, {"es": "hospedarse (en)", "en": "to stay at"}, {"es": "llegar/ arribar", "en": "to arrive"}, {"es": "recoger", "en": "to pick up"}, {"es": "regresar", "en": "to return"}, {"es": "reunirse (con)", "en": "to meet"}, {"es": "volar", "en": "to fly"}, {"es": "volver", "en": "to return"}, {"es": "abordar", "en": "to board"}], "SPA 103 — Nouns": [{"es": "el mediodía", "en": "Noon"}, {"es": "la medianoche", "en": "Midnight"}, {"es": "el bolígrafo", "en": "ballpoint pen"}, {"es": "el borrador", "en": "eraser/duster"}, {"es": "el cartel/ el poster", "en": "poster/sign"}, {"es": "la computadora / el ordenador", "en": "computer"}, {"es": "el cuaderno", "en": "notebook"}, {"es": "el escritorio", "en": "desk"}, {"es": "el lápiz", "en": "pencil"}, {"es": "el libro", "en": "book"}, {"es": "el mapa", "en": "map"}, {"es": "la mesa", "en": "table"}, {"es": "la mochila", "en": "backpack"}, {"es": "la pantalla", "en": "screen"}, {"es": "el papel", "en": "paper"}, {"es": "la papelera", "en": "trash can"}, {"es": "la pizarra", "en": "chalkboard"}, {"es": "el proyector", "en": "projector"}, {"es": "la puerta", "en": "door"}, {"es": "el reloj", "en": "clock"}, {"es": "la silla", "en": "chair"}, {"es": "la tiza", "en": "chalk"}, {"es": "la ventana", "en": "window"}, {"es": "el/la abuelo/a", "en": "grandfather/grandmother"}, {"es": "la esposa", "en": "wife"}, {"es": "el esposo/marido", "en": "husband"}, {"es": "el/la hermano/a", "en": "brother/sister"}, {"es": "la madre / mamá", "en": "mother"}, {"es": "la mascota", "en": "pet"}, {"es": "el/la nieto/a", "en": "grandson/grandaughter"}, {"es": "el padre/ papá", "en": "father"}, {"es": "el/la primo/a", "en": "cousin"}, {"es": "el/la sobrino/a", "en": "nephew/niece"}, {"es": "el/la tío/a", "en": "uncle/aunt"}, {"es": "los parientes", "en": "relatives"}, {"es": "los abuelos", "en": "grandparents"}, {"es": "los hermanos", "en": "sibilings"}, {"es": "los hijos", "en": "children / offspring"}, {"es": "los padres", "en": "parents"}, {"es": "el cuerpo", "en": "body"}, {"es": "la barriga", "en": "tummy/belly"}, {"es": "los brazos", "en": "arms"}, {"es": "el codo", "en": "elbow"}, {"es": "el corazón", "en": "heart"}, {"es": "el cuello", "en": "neck"}, {"es": "los dedos", "en": "fingers"}, {"es": "la espalda", "en": "back"}, {"es": "los hombros", "en": "shoulders"}, {"es": "las manos", "en": "hands"}, {"es": "la piel", "en": "skin"}, {"es": "las piernas", "en": "legs"}, {"es": "los pies", "en": "feet"}, {"es": "las rodillas", "en": "knees"}, {"es": "la cabeza", "en": "head"}, {"es": "la boca", "en": "mouth"}, {"es": "la cara", "en": "face"}, {"es": "los dientes", "en": "teeth"}, {"es": "la frente", "en": "forehead"}, {"es": "la lengua", "en": "tongue"}, {"es": "la nariz", "en": "nose"}, {"es": "los ojos", "en": "eyes"}, {"es": "las orejas", "en": "ears"}, {"es": "el pelo", "en": "hair"}, {"es": "el/la analista", "en": "analist"}, {"es": "el/la dentista", "en": "dentist"}, {"es": "el/la profesor(a)", "en": "teacher/professor"}, {"es": "el presidente/la presidenta", "en": "president"}, {"es": "el/la psicólogo/a", "en": "psychologist"}, {"es": "el/la gobernador(a)", "en": "governor"}, {"es": "el/la senador(a)", "en": "senator"}, {"es": "el/la veterinario/a", "en": "veterinarian"}, {"es": "el actor/la actriz", "en": "actor/actress"}, {"es": "el/la abogado/a", "en": "lawyer"}, {"es": "el/la arquitecto/a", "en": "architecture"}, {"es": "el/la bibliotecario/a", "en": "librarian"}, {"es": "el/la cantante", "en": "singer"}, {"es": "el/la contador(a)", "en": "accountant"}, {"es": "el/la carpintero/a", "en": "carpenter"}, {"es": "el/la cocinero/a", "en": "cook/ chef"}, {"es": "el/la chef", "en": "cook/ chef"}, {"es": "el/la contratista", "en": "contractor"}, {"es": "el/la diseñador(a)", "en": "designer"}, {"es": "el/la paisajista", "en": "landscaper"}, {"es": "el/la enfermero/a", "en": "nurse"}, {"es": "el/la escritor(a)", "en": "writer"}, {"es": "el/la escultor(a)", "en": "sculptor"}, {"es": "el/la físico/a", "en": "physicist"}, {"es": "el/la ingeniero/a", "en": "engineer"}, {"es": "el/la jefe", "en": "boss"}, {"es": "el/la juez/a", "en": "judge"}, {"es": "el/la maestro/a", "en": "teacher"}, {"es": "el/la médico/a", "en": "physician"}, {"es": "el/la periodista", "en": "journalist"}, {"es": "el/la programador(a)", "en": "(computer) programmer"}, {"es": "el soldado/la mujer soldado", "en": "soldier"}, {"es": "el balcón", "en": "balcony"}, {"es": "el garaje", "en": "garage"}, {"es": "el jardín", "en": "garden"}, {"es": "el patio", "en": "patio"}, {"es": "el baño", "en": "the bathroom"}, {"es": "la ducha", "en": "shower"}, {"es": "el espejo", "en": "mirror"}, {"es": "el comedor", "en": "dining room"}, {"es": "la cocina", "en": "kitchen"}, {"es": "la habitación / el cuarto", "en": "bedroom"}, {"es": "el armario / el closet", "en": "closet"}, {"es": "la cama", "en": "bed"}, {"es": "el invierno", "en": "winter"}, {"es": "la primavera", "en": "spring"}, {"es": "el otoño", "en": "autumn, fall"}, {"es": "el verano", "en": "summer"}, {"es": "las tiendas", "en": "stores"}, {"es": "el centro comercial", "en": "mall/ shopping center"}, {"es": "el supermercado", "en": "the grocery store"}, {"es": "el bosque", "en": "forest"}, {"es": "las cataratas", "en": "waterfalls"}, {"es": "la colina", "en": "hill"}, {"es": "la cordillera", "en": "mountain range"}, {"es": "el lago", "en": "lake"}, {"es": "la llanura", "en": "plain, prairie"}, {"es": "el mar", "en": "sea"}, {"es": "el paisaje", "en": "landscape"}, {"es": "La playa", "en": "beach"}, {"es": "el río", "en": "river"}, {"es": "la selva", "en": "jungle"}, {"es": "el valle", "en": "valley"}, {"es": "el aniversario (de boda)", "en": "(wedding) anniversary"}, {"es": "el cumpleaños", "en": "birthday"}, {"es": "la carne", "en": "meat"}, {"es": "el huevo", "en": "egg"}, {"es": "el pescado", "en": "fish"}, {"es": "el pollo", "en": "chicken"}, {"es": "el queso", "en": "cheese"}, {"es": "la fruta", "en": "fruit"}, {"es": "la verdura", "en": "vegetable"}, {"es": "el pan", "en": "bread"}, {"es": "el agua (mineral)", "en": "(mineral) water"}, {"es": "la leche", "en": "milk"}, {"es": "el refresco", "en": "soda"}, {"es": "el té", "en": "tea"}, {"es": "el almuerzo", "en": "lunch"}, {"es": "la cena", "en": "dinner"}, {"es": "el desayuno", "en": "breakfast"}, {"es": "la merienda", "en": "afternoon snack"}, {"es": "el azúcar", "en": "sugar"}, {"es": "la sal", "en": "salt"}, {"es": "la pimienta", "en": "pepper"}, {"es": "la botella", "en": "bottle"}, {"es": "la cuchara", "en": "spoon"}, {"es": "el cuchillo", "en": "knife"}, {"es": "la taza", "en": "a cup/ mug"}, {"es": "el plato", "en": "plate"}, {"es": "el tenedor", "en": "fork"}, {"es": "el vaso", "en": "glass"}, {"es": "el almacén", "en": "department store"}, {"es": "el centro comercial", "en": "shopping center"}, {"es": "el mercado (al aire libre)", "en": "(open-air) market"}, {"es": "la(s) rebaja(s)", "en": "discount/ sales"}, {"es": "el supermercado", "en": "grocery store"}, {"es": "la tienda", "en": "store"}, {"es": "los recuerdos", "en": "souvenirs"}, {"es": "la caja", "en": "the cashier"}, {"es": "el/la cliente", "en": "customer"}, {"es": "el/la dependiente/a", "en": "sales clerk"}, {"es": "el descuento", "en": "discount"}, {"es": "el precio", "en": "price"}, {"es": "el probador", "en": "fitting room"}, {"es": "el recibo", "en": "reciept"}, {"es": "la semana que viene", "en": "next week"}, {"es": "el mes/año que viene", "en": "next month/year"}, {"es": "la ropa", "en": "Clothes"}, {"es": "el abrigo", "en": "coat"}, {"es": "la blusa", "en": "blouse"}, {"es": "las botas", "en": "boots"}, {"es": "los calcetines", "en": "socks"}, {"es": "la camisa", "en": "shirt"}, {"es": "la camiseta", "en": "t-shirt"}, {"es": "la falda", "en": "skirt"}, {"es": "la gorra", "en": "cap"}, {"es": "los guantes", "en": "gloves"}, {"es": "el impermeable", "en": "raincoat"}, {"es": "los lentes", "en": "glasses"}, {"es": "los pantalones", "en": "pants"}, {"es": "el pijama", "en": "pajamas"}, {"es": "la ropa interior", "en": "underwear"}, {"es": "la sudadera", "en": "sweatshirt"}, {"es": "el suéter", "en": "sweater"}, {"es": "el traje", "en": "suit"}, {"es": "el vestido", "en": "dress"}, {"es": "los zapatos", "en": "shoes"}, {"es": "la billetera", "en": "wallet"}, {"es": "la bolsa/el bolso", "en": "handbag/ bag"}, {"es": "la bufanda", "en": "scarf"}, {"es": "el cinturón", "en": "belt"}, {"es": "el paraguas", "en": "umbrella"}, {"es": "el sombrero", "en": "hat (with brim)"}, {"es": "la catástrofe/el desastre", "en": "catastrophe/disaster"}, {"es": "la conquista", "en": "conquest"}, {"es": "la independencia", "en": "independence"}, {"es": "la revolución", "en": "revolution"}, {"es": "la elección", "en": "election"}, {"es": "la colonización", "en": "colonization"}, {"es": "la guerra", "en": "war"}, {"es": "el descubrimiento", "en": "discovery"}, {"es": "la herencia", "en": "heritage"}, {"es": "la paz", "en": "peace"}, {"es": "el tratado", "en": "treaty"}, {"es": "la partida", "en": "departure"}, {"es": "la llegada", "en": "arrival"}, {"es": "el fracaso", "en": "failure"}, {"es": "las tensiones políticas", "en": "political tensions"}, {"es": "la fiesta", "en": "party"}, {"es": "los regalos", "en": "gifts"}, {"es": "el pastel/la torta/el ponqué/el bizcocho", "en": "cake"}, {"es": "la boda/el matrimonio", "en": "wedding"}, {"es": "el/la novio/a", "en": "fiancé/fiancée"}, {"es": "el/la anfitrión/a", "en": "host"}, {"es": "el/la invitado/a", "en": "guest"}, {"es": "el disfraz", "en": "costume"}, {"es": "la vela/ las velitas", "en": "candles"}, {"es": "las etapas (de la vida)", "en": "stages (in life)"}, {"es": "la niñez/infancia", "en": "Childhood"}, {"es": "la juventud", "en": "Youth"}, {"es": "la jubilación/ el retiro", "en": "retirement"}, {"es": "la vejez", "en": "Old age"}, {"es": "el nacimiento", "en": "Birth"}, {"es": "la muerte", "en": "Death"}, {"es": "la primera vez", "en": "the first time"}, {"es": "la última vez", "en": "the last time"}, {"es": "la fecha", "en": "date"}, {"es": "la época", "en": "era"}, {"es": "el personaje", "en": "character"}, {"es": "el/la dios/a", "en": "god/goddess"}, {"es": "la luna", "en": "moon"}, {"es": "el sol", "en": "sun"}, {"es": "el cuento/la historia", "en": "story"}, {"es": "la criatura", "en": "creature"}, {"es": "el fantasma", "en": "ghost"}, {"es": "el monstruo", "en": "monster"}, {"es": "el diablo", "en": "devil"}, {"es": "los poderes", "en": "powers"}, {"es": "los impuestos", "en": "taxes"}, {"es": "el desempleo", "en": "unemployment"}, {"es": "el empleo", "en": "employment"}, {"es": "la inflación", "en": "inflation"}, {"es": "los países desarrollados", "en": "developed countries"}, {"es": "la pobreza", "en": "poverty"}, {"es": "la riqueza", "en": "wealth"}, {"es": "la desforestación", "en": "deforestation"}, {"es": "el petróleo", "en": "petroleum"}, {"es": "el producto biodegradable", "en": "biodegradable product"}, {"es": "la tierra", "en": "earth"}, {"es": "el basurero", "en": "landfill"}, {"es": "la botella (de plástico/de vidrio)", "en": "(plastic/glass) bottle"}, {"es": "el cambio climático", "en": "climate change"}, {"es": "los combustibles fósiles", "en": "fossil fuels"}, {"es": "la contaminación (del agua/aire)", "en": "(water/air) pollution"}, {"es": "la escasez", "en": "shortage"}, {"es": "la fábrica", "en": "factory"}, {"es": "la naturaleza", "en": "nature"}, {"es": "el producto desechable", "en": "disposable product"}, {"es": "los recursos naturales", "en": "natural resources"}, {"es": "la basura", "en": "trash"}, {"es": "la prensa", "en": "press"}, {"es": "el acontecimiento", "en": "happening, event"}, {"es": "el reportaje", "en": "report"}, {"es": "el periódico", "en": "newspaper"}, {"es": "la noticia", "en": "piece of news"}, {"es": "el titular", "en": "headline"}, {"es": "la bajada", "en": "subheadline"}, {"es": "la censura", "en": "censorship"}, {"es": "la entrevista", "en": "interview"}, {"es": "los síntomas", "en": "symptoms"}, {"es": "la alergia", "en": "allergies"}, {"es": "la aspirina", "en": "aspirin"}, {"es": "el examen médico", "en": "medical exam"}, {"es": "el(la) paciente", "en": "patient"}, {"es": "el consultorio (del médico)", "en": "doctor's office"}, {"es": "la pastilla", "en": "pill"}, {"es": "la presión arterial", "en": "blood pressure"}, {"es": "la receta", "en": "prescription"}, {"es": "el seguro médico", "en": "health insurance"}, {"es": "la placa", "en": "x-ray"}, {"es": "el bienestar", "en": "well-being"}, {"es": "el(la) ciudadano(a)", "en": "citizen"}, {"es": "el deber", "en": "duty"}, {"es": "la democracia", "en": "democracy"}, {"es": "el(la) dictador(a)", "en": "dictator"}, {"es": "el discurso", "en": "speech"}, {"es": "el ejército", "en": "army"}, {"es": "la ley", "en": "law"}, {"es": "el poder", "en": "power"}, {"es": "el(la) político(a)", "en": "politician"}, {"es": "el crimen", "en": "crime"}, {"es": "los derechos civiles", "en": "civil rights"}, {"es": "los derechos humanos", "en": "human rights"}, {"es": "la (des)igualdad", "en": "(in)equality"}, {"es": "la (in)seguridad", "en": "(in)security"}, {"es": "el voto", "en": "vote"}, {"es": "la campaña", "en": "campaign"}, {"es": "el(la) candidato(a)", "en": "candidate"}, {"es": "el congreso", "en": "congress"}, {"es": "el debate", "en": "debate"}, {"es": "las elecciones", "en": "elections"}, {"es": "la oposición", "en": "opposition"}, {"es": "el partido político", "en": "political party"}, {"es": "el(la) presidente(a)", "en": "president"}, {"es": "el Senado", "en": "the Senate"}, {"es": "el distrito", "en": "district"}, {"es": "el estado", "en": "the state"}, {"es": "el voto popular", "en": "popular vote"}, {"es": "el aparato (eléctrico/ electrónico)", "en": "device"}, {"es": "los audífonos/ los auriculares", "en": "headphones"}, {"es": "una selfie (una autofoto)", "en": "a selfie"}, {"es": "la cámara (digital)", "en": "(digital) camera"}, {"es": "el cargador", "en": "charger"}, {"es": "la tableta", "en": "tablet"}, {"es": "las baterías", "en": "batteries"}, {"es": "el teléfono inteligente", "en": "smart phone"}, {"es": "el teléfono celular / el móvil", "en": "cell phone"}, {"es": "el televisor (de pantalla plana)", "en": "(flat-screen) TV"}, {"es": "la videocámara digital", "en": "digital video camera"}, {"es": "el videojuego", "en": "video game"}, {"es": "las redes sociales", "en": "social networks"}, {"es": "el tuit", "en": "tweet"}, {"es": "la computadora (portátil)", "en": "(laptop) computer"}, {"es": "la pantalla (táctil)", "en": "the (touch) screen"}, {"es": "el ratón", "en": "mouse"}, {"es": "el teclado", "en": "keyboard"}, {"es": "el guión", "en": "script"}, {"es": "el escenario", "en": "stage"}, {"es": "el espectador", "en": "spectator"}, {"es": "el acto", "en": "act"}, {"es": "las luces", "en": "lights"}, {"es": "la escena", "en": "scene"}, {"es": "la actuación", "en": "acting"}, {"es": "los sonidos", "en": "sounds"}, {"es": "el ensayo", "en": "rehearsal"}, {"es": "las entradas", "en": "tickets"}, {"es": "el estreno", "en": "the premiere/opening night"}, {"es": "el papel", "en": "the role/the part"}, {"es": "la arquitectura", "en": "architecture"}, {"es": "la escultura", "en": "sculpture"}, {"es": "la fotografía", "en": "photography"}, {"es": "la pintura", "en": "painting"}, {"es": "la poesía", "en": "poetry"}, {"es": "el teatro", "en": "theater"}, {"es": "el(la) artista", "en": "artist"}, {"es": "el(la) autor(a)", "en": "author"}, {"es": "el actor", "en": "actor"}, {"es": "la actriz", "en": "actress"}, {"es": "el anuncio", "en": "commercial"}, {"es": "la publicidad", "en": "advertisement"}, {"es": "el canal", "en": "(TV) channel"}, {"es": "el capítulo", "en": "episode"}, {"es": "el cine", "en": "movies, movie theater"}, {"es": "la comedia", "en": "comedy"}, {"es": "los dibujos animados", "en": "cartoons"}, {"es": "el documental", "en": "documentary"}, {"es": "el drama", "en": "drama"}, {"es": "el musical", "en": "musical (play)"}, {"es": "las noticias", "en": "news"}, {"es": "la película", "en": "movie, film"}, {"es": "la película clásica", "en": "classic film"}, {"es": "la película extranjera", "en": "foreign film"}, {"es": "la película fantástica", "en": "fantasy film"}, {"es": "la película romántica", "en": "romantic film"}, {"es": "el programa deportivo", "en": "sports program"}, {"es": "el/la protagonista", "en": "protagonist"}, {"es": "la telenovela", "en": "soap opera"}, {"es": "la trama", "en": "plot"}, {"es": "el/la voluntario/a", "en": "volunteer (worker)"}, {"es": "la organización no gubernamental (ONG)", "en": "non-governmental organization (NGO)"}, {"es": "el reto", "en": "challenge"}, {"es": "el obstáculo", "en": "obstacle"}, {"es": "el/la activista político", "en": "political activist"}, {"es": "la concienciación/ concientización", "en": "awareness"}, {"es": "el tema", "en": "theme/issue"}, {"es": "el riesgo", "en": "risk"}, {"es": "la(s) causa(s)", "en": "cause(s)"}, {"es": "la brecha (entre)", "en": "the gap"}, {"es": "los marginados", "en": "outcasts, allineated"}, {"es": "la exclusión", "en": "exclusion"}, {"es": "la inclusión", "en": "inclusion"}, {"es": "la discriminación", "en": "discrimination"}, {"es": "la igualdad", "en": "equality"}, {"es": "el/la inmigrante", "en": "immigrant"}, {"es": "el inmigrante indocumentado", "en": "undocumented immigrant"}, {"es": "el/la refugiado(a)", "en": "refugee"}, {"es": "el muro fronterizo", "en": "border wall"}, {"es": "la frontera", "en": "border"}, {"es": "la ciudadanía", "en": "citizenship"}, {"es": "el aeropuerto", "en": "airport"}, {"es": "el asiento", "en": "seat"}, {"es": "la aduana", "en": "customs"}, {"es": "el boleto", "en": "ticket"}, {"es": "la cámara", "en": "camera"}, {"es": "la cancelación", "en": "cancellation"}, {"es": "el destino", "en": "destination"}, {"es": "la dirección", "en": "address"}, {"es": "el equipaje", "en": "luggage"}, {"es": "la escala (hacer ~)", "en": "stopover; layover; stops"}, {"es": "el/la extranjero/a", "en": "foreigner"}, {"es": "el hospedaje", "en": "accomodation"}, {"es": "el itinerario", "en": "itinerary"}, {"es": "la llegada/ el arribo", "en": "arrival"}, {"es": "la maleta", "en": "suitcase"}, {"es": "la moneda; el cambio", "en": "currency; the exchange rate"}, {"es": "el pasaporte", "en": "passport"}, {"es": "la recepción", "en": "the reception"}, {"es": "el retraso/la demora", "en": "the delay"}, {"es": "la visa, el visado", "en": "the visa"}, {"es": "el/la visitante", "en": "visitors"}, {"es": "el vuelo", "en": "flight"}, {"es": "el autobús (bus, ómnibus)", "en": "bus"}, {"es": "el avión", "en": "plane"}, {"es": "el barco", "en": "boat, ship"}, {"es": "la bicicleta", "en": "bicycle"}, {"es": "el caballo", "en": "horse"}, {"es": "el carro (coche, auto)", "en": "car"}, {"es": "el crucero (hacer un ~)", "en": "cruise (go on a ~)"}, {"es": "el taxi", "en": "cab"}, {"es": "el tren", "en": "train"}], "SPA 103 — Adjectives": [{"es": "lunes", "en": "Monday"}, {"es": "martes", "en": "Tuesday"}, {"es": "miércoles", "en": "Wednesday"}, {"es": "jueves", "en": "Thursday"}, {"es": "viernes", "en": "Friday"}, {"es": "sábado", "en": "Saturday"}, {"es": "domingo", "en": "Sunday"}, {"es": "aburrido/a", "en": "bored/boring"}, {"es": "agradable", "en": "pleasant/nice"}, {"es": "alegre", "en": "happy"}, {"es": "antipático/a", "en": "unfriendly/not nice"}, {"es": "divertido/a", "en": "fun"}, {"es": "egoísta", "en": "selfish"}, {"es": "humilde", "en": "humble"}, {"es": "listo/a", "en": "wise/intelligent"}, {"es": "perezoso/a", "en": "lazy"}, {"es": "sencillo/a", "en": "simple/easygoing"}, {"es": "simpático/a", "en": "nice"}, {"es": "talentoso/a", "en": "talented"}, {"es": "testarudo/a", "en": "stubborn"}, {"es": "tímido/a", "en": "shy"}, {"es": "tonto/a", "en": "dumb/silly"}, {"es": "tranquilo/a", "en": "quiet, easy going"}, {"es": "travieso/a", "en": "mischievous"}, {"es": "creativo/a", "en": "creative"}, {"es": "enérgico/a", "en": "energetic"}, {"es": "extrovertido/a", "en": "extrovert"}, {"es": "honesto/a", "en": "honest"}, {"es": "inteligente", "en": "intelligent, smart"}, {"es": "interesante", "en": "interesting"}, {"es": "introvertido/a", "en": "introvert"}, {"es": "optimista", "en": "optimistic"}, {"es": "pesimista", "en": "pesimistic"}, {"es": "serio/a", "en": "serious, responsible, accountable"}, {"es": "valiente", "en": "brave, valiant"}, {"es": "alto/a", "en": "tall (height)"}, {"es": "bajo/a", "en": "short (height)"}, {"es": "castaño/a", "en": "brown hair/ brunette"}, {"es": "corto/a", "en": "short (length)"}, {"es": "delgado/a", "en": "slim"}, {"es": "feo/a", "en": "ugly"}, {"es": "flaco/a", "en": "skinny"}, {"es": "gordito/a", "en": "chubby"}, {"es": "guapo/a", "en": "good-looking"}, {"es": "lacio", "en": "straight hair"}, {"es": "largo/a", "en": "long (length)"}, {"es": "pelirrojo/a", "en": "redheaded"}, {"es": "rubio/a", "en": "blond"}, {"es": "barato/a", "en": "cheap"}, {"es": "caro/a", "en": "expensive"}, {"es": "precioso/a", "en": "beautiful"}, {"es": "artesanía", "en": "crafts"}, {"es": "valiente", "en": "courageous"}, {"es": "cobarde", "en": "coward"}, {"es": "chocante", "en": "shocking"}, {"es": "irse", "en": "to leave"}, {"es": "necesitado/a", "en": "in need"}, {"es": "desfavorecido/a", "en": "disadvantaged/ underprivileged"}], "SPA 103 — Adverbs": [{"es": "hoy", "en": "today"}, {"es": "mañana", "en": "tomorrow"}, {"es": "ayer", "en": "yesterday"}], "SPA 103 — Adverb Phrases": [{"es": "el fin de semana", "en": "the weekend"}, {"es": "a/en la madrugada", "en": "In the wee hours"}, {"es": "el hombre/la mujer de negocios", "en": "businessman/businesswoman"}, {"es": "ir de compras", "en": "to go shopping"}, {"es": "de moda (estar~)", "en": "trendy/in fashion"}, {"es": "la tarjeta de crédito", "en": "credit card"}, {"es": "por la mañana/tarde/noche", "en": "in the morning/afternoon/night"}, {"es": "el traje de baño", "en": "swimsuit"}, {"es": "las gafas de sol", "en": "sunglasses"}, {"es": "el golpe de estado", "en": "coup d'état"}, {"es": "la libertad de expresión", "en": "freedom of speech"}, {"es": "la despedida de soltero/a", "en": "bachelor's party"}, {"es": "la luna de miel", "en": "honeymoon"}, {"es": "dar a luz", "en": "Give birth"}, {"es": "a principios de...", "en": "at the beginning of..."}, {"es": "a mediados de...", "en": "in the middle of..."}, {"es": "a finales de...", "en": "at the end of..."}, {"es": "al final", "en": "in the end"}, {"es": "de repente", "en": "suddenly"}, {"es": "los países en vías de desarrollo", "en": "developing countries"}, {"es": "la tasa de desempleo", "en": "unemployment rate"}, {"es": "la caja de cartón", "en": "cardboard box"}, {"es": "las especies en peligro de extinción", "en": "endangered species"}, {"es": "la lata de aluminio", "en": "aluminum can"}, {"es": "los medios de comunicación", "en": "media"}, {"es": "la Cámara de Representantes", "en": "the House of Representatives"}, {"es": "el mensaje de texto", "en": "text message"}, {"es": "la obra de arte", "en": "work of art"}, {"es": "la obra de teatro", "en": "play"}, {"es": "la película de acción", "en": "action film"}, {"es": "la película de ciencia ficción", "en": "science fiction movie"}, {"es": "la película de suspenso (misterio)", "en": "suspense/mystery film"}, {"es": "la película de terror", "en": "horror film"}, {"es": "el programa de concursos", "en": "game show"}, {"es": "el programa de entrevistas", "en": "talk show"}, {"es": "el programa de realidad/el reality", "en": "reality (TV) show"}, {"es": "darle miedo a alguien", "en": "to scare someone (lit: to give someone fright)"}, {"es": "la organización sin fines de lucro", "en": "non-profit organization"}, {"es": "la falta de", "en": "the lack of (something)"}, {"es": "los sin techo", "en": "homeless"}, {"es": "dar por sentado", "en": "to take for granted"}, {"es": "ir de camping, acampar", "en": "to go camping"}, {"es": "el permiso de residencia", "en": "residency permit"}, {"es": "la sala de espera", "en": "waiting room"}, {"es": "la salida/ hora de salida", "en": "exit/ time of departure"}, {"es": "la tarjeta de embarque", "en": "boarding pass"}, {"es": "la tienda de campaña", "en": "tent"}], "SPA 103 — Other / Mixed": [{"es": "Es la../Son las…", "en": "It is…"}, {"es": "1 uno", "en": "one"}, {"es": "2 dos", "en": "two"}, {"es": "3 tres", "en": "three"}, {"es": "4 cuatro", "en": "four"}, {"es": "5 cinco", "en": "five"}, {"es": "6 seis", "en": "six"}, {"es": "7 siete", "en": "seven"}, {"es": "8 ocho", "en": "eight"}, {"es": "9 nueve", "en": "nine"}, {"es": "10 diez", "en": "ten"}, {"es": "11 once", "en": "eleven"}, {"es": "12 doce", "en": "twelve"}, {"es": "13 trece", "en": "thirteen"}, {"es": "14 catorce", "en": "fourteen"}, {"es": "15 quince", "en": "fifteen"}, {"es": "16 dieciséis", "en": "sixteen"}, {"es": "17 diecisiete", "en": "seventeen"}, {"es": "18 dieciocho", "en": "eighteen"}, {"es": "19 diecinueve", "en": "nineteen"}, {"es": "20 veinte", "en": "twenty"}, {"es": "21 veintiuno", "en": "twenty-one"}, {"es": "22 veintidós", "en": "twenty-two"}, {"es": "23 veintitrés", "en": "twenty-three"}, {"es": "24 veinticuatro", "en": "twenty-four"}, {"es": "25 veinticinco", "en": "twenty-five"}, {"es": "26 veintiséis", "en": "twenty-six"}, {"es": "27 veintisiete", "en": "twenty-seven"}, {"es": "28 veintiocho", "en": "twenty-eight"}, {"es": "29 veintinueve", "en": "twenty-nine"}, {"es": "30 treinta", "en": "thirty"}, {"es": "31 treinta y uno", "en": "thirty-one"}, {"es": "40 cuarenta", "en": "forty"}, {"es": "43 cuarenta y tres", "en": "forty three"}, {"es": "50 cincuenta", "en": "fifty"}, {"es": "60 sesenta", "en": "sixty"}, {"es": "70 setenta", "en": "seventy"}, {"es": "80 ochenta", "en": "eighty"}, {"es": "90 noventa", "en": "ninety"}, {"es": "100 cien", "en": "one hundred"}, {"es": "pasarlo bien (Esp)", "en": "to have fun / to have a good time"}, {"es": "pasarla bien (AmL)", "en": "to have fun / to have a good time"}, {"es": "ser", "en": "to be"}, {"es": "ver", "en": "to see"}, {"es": "dar un paseo", "en": "to take a walk/to stroll"}, {"es": "paciente (impaciente)", "en": "(im)patient"}, {"es": "trabajador(a)", "en": "hardworking"}, {"es": "moreno/a (skin or hair)", "en": "dark skinned / haired"}, {"es": "rizado/crespo (pelo)", "en": "curly hair"}, {"es": "Está despejado.", "en": "It’s clear."}, {"es": "Está (muy) nublado.", "en": "It’s (very) cloudy."}, {"es": "Hace buen/mal tiempo.", "en": "It’s good/bad weather."}, {"es": "Hace (mucho) calor.", "en": "It’s (very) hot."}, {"es": "Hace (mucho) frío.", "en": "It’s (very) cold."}, {"es": "Hace (mucho) sol.", "en": "It’s (very) sunny."}, {"es": "Hace (mucho) viento.", "en": "It’s (very) windy."}, {"es": "Me queda muy bien.", "en": "It fits me fine."}, {"es": "Quisiera ver...", "en": "I'd like to see..."}, {"es": "dar", "en": "to give"}, {"es": "pasado mañana", "en": "the day after tomorrow"}, {"es": "pasarlo bien/mal", "en": "to have a good/bad time"}, {"es": "101 ciento uno/a", "en": "one hundred and one"}, {"es": "200 doscientos/as", "en": "two hundred"}, {"es": "300 trescientos/as", "en": "three hundred"}, {"es": "400 cuatrocientos/as", "en": "four hundred"}, {"es": "500 quinientos/as", "en": "five hundred"}, {"es": "600 seiscientos/as", "en": "six hundred"}, {"es": "700 setecientos/as", "en": "seven hundred"}, {"es": "800 ochocientos/as", "en": "eight hundred"}, {"es": "900 novecientos/as", "en": "nine hundred"}, {"es": "1000 mil", "en": "one thousand"}, {"es": "1200 mil doscientos", "en": "one thousand two hundred"}, {"es": "2000 dos mil", "en": "two thousand"}, {"es": "2001 dos mil uno", "en": "two thousand and one"}, {"es": "2010 dos mil diez", "en": "two thousand and ten"}, {"es": "3000 tres mil", "en": "three thousand"}, {"es": "4000 cuatro mil", "en": "four hundred"}, {"es": "4025 cuatro mil veinticinco", "en": "four thousand twenty five"}, {"es": "5000 cinco mil", "en": "five thousand"}, {"es": "8078 ocho mil setenta y ocho", "en": "eight thousand seventy eight"}, {"es": "9099 nueve mil noventa y nueve", "en": "nine thousand and ninety nine"}, {"es": "10.000 diez mil", "en": "ten thousand"}, {"es": "hace un mes que...", "en": "a month ago"}, {"es": "desconocido(a)", "en": "unknown / stranger"}, {"es": "luego / entonces", "en": "then / later"}, {"es": "poner(le) una inyección (a alguien)", "en": "to give (someone) a shot"}, {"es": "sacar(le) sangre (a alguien)", "en": "to draw (someone's) blood"}, {"es": "tomar(le) la temperatura", "en": "to take (someone's) temperature"}, {"es": "apagado(a)", "en": "off"}, {"es": "prendido(a)", "en": "on"}, {"es": "enchufado(a)", "en": "plugged in"}, {"es": "encendido(a)", "en": "on"}, {"es": "aburrido(a)", "en": "boring"}, {"es": "controvertido(a)", "en": "controversial"}, {"es": "gracioso(a)", "en": "funny"}, {"es": "entretenido(a)", "en": "entertaining"}, {"es": "escandaloso(a)", "en": "scandalous"}, {"es": "exagerado(a)", "en": "extravagant/exaggerated"}, {"es": "dar asco", "en": "to gross out"}, {"es": "irse del hotel", "en": "to check out"}, {"es": "extranjero(a)", "en": "foreigner"}], "SPA 103 — Useful Sentences": [{"es": "¿Cuál es la fecha de hoy?", "en": "What’s the date today?"}, {"es": "¿Qué hora es?", "en": "What time is it?"}, {"es": "¿A qué hora...? (Marks an event)", "en": "At what time...?"}, {"es": "el/la jugador(a) (de fútbol, de baloncesto, etc)", "en": "player"}, {"es": "¿Cómo está el clima/tiempo hoy?", "en": "What's the weather like today?"}, {"es": "¡Buen provecho!", "en": "Enjoy!"}, {"es": "el jugo/ el zumo (de naranja, etc)", "en": "juice"}, {"es": "¿Cuánto cuesta(n)?", "en": "How much is it? How much are they?"}, {"es": "¿Puedo probarme...?", "en": "Can I try x on?"}, {"es": "¡Felicitaciones (por)! (Lat.Am)", "en": "Congratulations"}, {"es": "¡Enhorabuena! (Spain)", "en": "Congratulations"}, {"es": "¿Cuántos años tiene/tienes?", "en": "How old are you?"}, {"es": "registrarse en el hotel (hacer el check-in)", "en": "to check in"}, {"es": "la excursión (hacer una excursión; ir de ~)", "en": "field trip"}, {"es": "el viaje (hacer un ~; ir de ~)", "en": "the trip (to go on a trip)"}], "★ Latin Root Transitions": [{"en": "English -quence → Spanish -cuencia (e.g., frequency → frecuencia)", "es": "-quence → -cuencia"}, {"en": "English -tion → Spanish -ción (nation → nación)", "es": "-tion → -ción"}, {"en": "English -sion → Spanish -sión (decision → decisión)", "es": "-sion → -sión"}, {"en": "English -ity → Spanish -idad (activity → actividad)", "es": "-ity → -idad"}, {"en": "English -ous → Spanish -oso/a (curious → curioso)", "es": "-ous → -oso/-osa"}, {"en": "English -al → Spanish -al (natural → natural)", "es": "-al → -al"}, {"en": "English -ance/-ence → Spanish -ancia/-encia (difference → diferencia)", "es": "-ance/-ence → -ancia/-encia"}, {"en": "English -ary → Spanish -ario/a (necessary → necesario)", "es": "-ary → -ario/-aria"}, {"en": "English -ive → Spanish -ivo/a (creative → creativo)", "es": "-ive → -ivo/-iva"}, {"en": "English -ible/-able → Spanish -ible/-able (possible → posible)", "es": "-ible/-able → -ible/-able"}, {"en": "English -ph → Spanish -f (photo → foto)", "es": "ph → f"}, {"en": "English -th → Spanish -t (theory → teoría)", "es": "th → t"}, {"en": "English -ct → Spanish -t (action → acción; direct → directo)", "es": "ct → t"}, {"en": "English -mn → Spanish -n (column → columna)", "es": "mn → n"}, {"en": "English initial s+consonant → add e- (special → especial)", "es": "sC- → esC-"}], "★ Conjugations": [{"en": "-o, -as, -a, -amos, -áis, -an", "es": "Present -AR"}, {"en": "-o, -es, -e, -emos, -éis, -en", "es": "Present -ER"}, {"en": "-o, -es, -e, -imos, -ís, -en", "es": "Present -IR"}, {"en": "-é, -aste, -ó, -amos, -asteis, -aron", "es": "Preterite -AR"}, {"en": "-í, -iste, -ió, -imos, -isteis, -ieron", "es": "Preterite -ER/-IR"}, {"en": "-aba, -abas, -aba, -ábamos, -abais, -aban", "es": "Imperfect -AR"}, {"en": "-ía, -ías, -ía, -íamos, -íais, -ían", "es": "Imperfect -ER/-IR"}, {"en": "infinitive + -é, -ás, -á, -emos, -éis, -án", "es": "Future (all verbs)"}, {"en": "infinitive + -ía, -ías, -ía, -íamos, -íais, -ían", "es": "Conditional (all verbs)"}, {"en": "-e, -es, -e, -emos, -éis, -en", "es": "Present Subjunctive -AR"}, {"en": "-a, -as, -a, -amos, -áis, -an", "es": "Present Subjunctive -ER/-IR"}, {"en": "-ra, -ras, -ra, -ramos, -rais, -ran", "es": "Imperfect Subjunctive (-ra)"}, {"en": "-se, -ses, -se, -semos, -seis, -sen", "es": "Imperfect Subjunctive (-se)"}]};
 
-    { en: "coaster (under a cup)", es: "el posavasos" },
-    { en: "décima (poetic form)", es: "la décima" },
-    { en: "a poem of ten lines", es: "un poema de diez versos" },
-    { en: "challenged (adj.)", es: "retado/a" },
-    { en: "from Madrid (adj.)", es: "matritense" },
-
-    { en: "a TED talk", es: "una charla TED" },
-    { en: "to reflect (on)", es: "reflexionar (sobre)" },
-    { en: "to relate (to)", es: "relacionarse (con)" },
-    { en: "to write songs", es: "escribir canciones" },
-
-    { en: "Uruguayan", es: "uruguayo/a" },
-    { en: "round", es: "redondo/a" },
-    { en: "bar", es: "el bar" },
-    { en: "to jot down / write down", es: "anotar" },
-    { en: "to add", es: "añadir" },
-
-    { en: "Jewish", es: "judío/judía" },
-    { en: "German", es: "alemán/alemana" },
-    { en: "to escape", es: "escapar" },
-    { en: "Nazi Germany", es: "la Alemania nazi" },
-
-    { en: "surgeon", es: "cirujano/a" },
-    { en: "profession", es: "la profesión" },
-    { en: "to leave behind", es: "dejar" },
-    { en: "to dedicate oneself to", es: "dedicarse a" },
-
-    { en: "borrowed (adj.)", es: "prestado/a" },
-    { en: "to impact / to affect", es: "impactar" },
-    { en: "to confess", es: "confesar" },
-
-    { en: "to realize", es: "darse cuenta (de)" },
-    { en: "true passion", es: "la verdadera pasión" },
-    { en: "to represent", es: "representar" },
-    { en: "a challenge", es: "un desafío" },
-    { en: "to accept", es: "aceptar" },
-    { en: "to impress", es: "impresionar" },
-    { en: "opportunity", es: "la oportunidad" },
-    { en: "to express", es: "expresar" },
-    { en: "feelings", es: "los sentimientos" },
-    { en: "to articulate", es: "articular" },
-    { en: "to highlight", es: "destacar" },
-    { en: "complexity", es: "la complejidad" },
-    { en: "humility", es: "la humildad" },
-    { en: "willingness to learn", es: "la disposición a aprender" },
-
-    { en: "conference / talk", es: "la conferencia" },
-    { en: "subtitles", es: "los subtítulos" },
-    { en: "to focus (on)", es: "centrarse (en)" },
-    { en: "to write down / note", es: "apuntar" },
-    { en: "new vocabulary", es: "el vocabulario nuevo" },
-
-    { en: "history", es: "la historia" },
-    { en: "spread / diffusion", es: "la difusión" },
-    { en: "variety", es: "la variedad" },
-    { en: "names", es: "los nombres" },
-    { en: "evolution", es: "la evolución" },
-    { en: "adaptation", es: "la adaptación" },
-    { en: "local traditions", es: "las tradiciones locales" },
-    { en: "to demonstrate / show", es: "demostrar" },
-    { en: "to remain the same", es: "permanecer igual" },
-    { en: "structure", es: "la estructura" },
-    { en: "rhyme", es: "la rima" },
-    { en: "syllables", es: "las sílabas" },
-    { en: "listeners", es: "los oyentes" },
-    { en: "to concentrate", es: "concentrarse" },
-    { en: "meaning", es: "el significado" },
-    { en: "musicality", es: "la musicalidad" },
-    { en: "rhythm", es: "el ritmo" },
-    { en: "to appreciate", es: "apreciar" },
-    { en: "technical complexity", es: "la complejidad técnica" }
-  ],
-
-  "Template (EMPTY)": [
-    { en: "add new words here", es: "añade palabras nuevas aquí" }
-  ]
-};
-
-/* =========================
-   UNKNOWN (“I don't know”) DECK (persisted)
-   ========================= */
 const UNKNOWN_DECK_KEY = "★ Unknown Deck (All 'I don’t know' cards)";
-const LS_UNKNOWN_SET = "spanishFlashcards_unknownSet_v1";   // stores { [cardId]: {en,es} }
-const LS_UNKNOWN_ORDER = "spanishFlashcards_unknownOrder_v1"; // stores [cardId,...] for stable order
+const KEY_SET = "spanishFlashcards_unknownSet_v6";
+const KEY_ORDER = "spanishFlashcards_unknownOrder_v6";
 
-function safeJSONParse(s, fallback) {
-  try { return JSON.parse(s); } catch { return fallback; }
+let memoryFallback = { setObj: {}, order: [] };
+
+function storageAvailable(type) {
+  try {
+    const s = window[type];
+    const test = "__test__";
+    s.setItem(test, test);
+    s.removeItem(test);
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+const storage = storageAvailable("localStorage")
+  ? window.localStorage
+  : (storageAvailable("sessionStorage") ? window.sessionStorage : null);
+
+function safeParse(s, fallback) {
+  try {
+    const v = JSON.parse(s);
+    return (v === null || v === undefined) ? fallback : v;
+  } catch {
+    return fallback;
+  }
+}
+
+function ensureArray(v) {
+  return Array.isArray(v) ? v : [];
+}
+function ensureObject(v) {
+  return (v && typeof v === "object" && !Array.isArray(v)) ? v : {};
 }
 
 function loadUnknownState() {
-  const setObj = safeJSONParse(localStorage.getItem(LS_UNKNOWN_SET), {});
-  const order = safeJSONParse(localStorage.getItem(LS_UNKNOWN_ORDER), []);
-  // prune order if missing in setObj
+  if (!storage) return memoryFallback;
+
+  const setObjRaw = safeParse(storage.getItem(KEY_SET), {});
+  const orderRaw = safeParse(storage.getItem(KEY_ORDER), []);
+  const setObj = ensureObject(setObjRaw);
+  const order = ensureArray(orderRaw);
+
   const pruned = order.filter(id => setObj[id]);
   if (pruned.length !== order.length) {
-    localStorage.setItem(LS_UNKNOWN_ORDER, JSON.stringify(pruned));
+    try { storage.setItem(KEY_ORDER, JSON.stringify(pruned)); } catch {}
   }
   return { setObj, order: pruned };
 }
 
 function saveUnknownState(setObj, order) {
-  localStorage.setItem(LS_UNKNOWN_SET, JSON.stringify(setObj));
-  localStorage.setItem(LS_UNKNOWN_ORDER, JSON.stringify(order));
+  const safeSet = ensureObject(setObj);
+  const safeOrder = ensureArray(order);
+
+  if (!storage) {
+    memoryFallback = { setObj: safeSet, order: safeOrder };
+    return;
+  }
+  try {
+    storage.setItem(KEY_SET, JSON.stringify(safeSet));
+    storage.setItem(KEY_ORDER, JSON.stringify(safeOrder));
+  } catch (e) {
+    memoryFallback = { setObj: safeSet, order: safeOrder };
+  }
 }
 
 function cardId(card) {
-  // stable id across decks: ES|EN (lowercased, trimmed)
   const es = (card.es || "").trim().toLowerCase();
   const en = (card.en || "").trim().toLowerCase();
   return `${es}|||${en}`;
 }
 
-function buildUnknownDeckFromStorage() {
-  const { setObj, order } = loadUnknownState();
-  return order.map(id => setObj[id]).filter(Boolean);
+function buildUnknownDeck() {
+  const state = loadUnknownState();
+  return state.order.map(id => state.setObj[id]).filter(Boolean);
 }
 
-/* =========================
-   APP STATE
-   ========================= */
 let deckKey = Object.keys(DECKS)[0];
 let deck = [...DECKS[deckKey]];
 let index = 0;
 
-let startSide = "EN";          // "EN" or "ES"
-let showingSpanish = false;    // current side showing
+let startSide = "EN";
+let showingSpanish = false;
 let audioOn = true;
 
-/* =========================
-   ELEMENTS
-   ========================= */
 const deckSelectEl = document.getElementById("deckSelect");
 const cardEl = document.getElementById("card");
 const wordEl = document.getElementById("word");
@@ -352,9 +193,6 @@ const audioLabel = document.getElementById("audioLabel");
 const unknownBtn = document.getElementById("unknownBtn");
 const unknownBadge = document.getElementById("unknownBadge");
 
-/* =========================
-   AUDIO
-   ========================= */
 function speak(text, lang) {
   if (!audioOn) return;
   if (!("speechSynthesis" in window)) return;
@@ -367,9 +205,6 @@ function speak(text, lang) {
   } catch {}
 }
 
-/* =========================
-   SHUFFLE
-   ========================= */
 function shuffleInPlace(arr) {
   for (let i = arr.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -377,40 +212,32 @@ function shuffleInPlace(arr) {
   }
 }
 
-/* =========================
-   DECK LOADING
-   ========================= */
-function getAllDeckKeysWithUnknownFirst() {
+function getAllDeckKeys() {
   const keys = Object.keys(DECKS);
   return [UNKNOWN_DECK_KEY, ...keys];
 }
 
 function getDeckCardsByKey(key) {
-  if (key === UNKNOWN_DECK_KEY) return buildUnknownDeckFromStorage();
+  if (key === UNKNOWN_DECK_KEY) return buildUnknownDeck();
   return [...(DECKS[key] || [])];
 }
 
-function loadDeck(newKey) {
-  deckKey = newKey;
+function loadDeck(key) {
+  deckKey = key;
   deck = getDeckCardsByKey(deckKey);
   index = 0;
   showingSpanish = (startSide === "ES");
   render();
 }
 
-/* =========================
-   UNKNOWN TOGGLE
-   ========================= */
-function currentCard() {
-  return deck[index];
-}
+function currentCard() { return deck[index]; }
 
 function isCurrentCardUnknown() {
   const c = currentCard();
   if (!c) return false;
   const id = cardId(c);
-  const { setObj } = loadUnknownState();
-  return Boolean(setObj[id]);
+  const state = loadUnknownState();
+  return Boolean(state.setObj[id]);
 }
 
 function setUnknownUI() {
@@ -429,46 +256,36 @@ function toggleUnknownForCurrentCard() {
   let order = state.order;
 
   if (setObj[id]) {
-    // remove
     delete setObj[id];
     order = order.filter(x => x !== id);
   } else {
-    // add
     setObj[id] = { en: c.en, es: c.es };
     if (!order.includes(id)) order.push(id);
   }
 
   saveUnknownState(setObj, order);
 
-  // If currently viewing the Unknown deck, refresh it (and keep index in bounds)
   if (deckKey === UNKNOWN_DECK_KEY) {
-    const prevId = c ? cardId(c) : null;
-    deck = buildUnknownDeckFromStorage();
-    if (deck.length === 0) {
-      index = 0;
-    } else if (prevId) {
+    const prevId = cardId(c);
+    deck = buildUnknownDeck();
+    if (deck.length === 0) index = 0;
+    else {
       const newIdx = deck.findIndex(card => cardId(card) === prevId);
       index = newIdx >= 0 ? newIdx : 0;
-    } else {
-      index = 0;
     }
   }
 
   render();
 }
 
-/* =========================
-   RENDER
-   ========================= */
 function render() {
   if (!deck.length) {
-    wordEl.textContent = (deckKey === UNKNOWN_DECK_KEY)
-      ? "No unknown cards yet"
-      : "No cards";
+    wordEl.textContent = (deckKey === UNKNOWN_DECK_KEY) ? "No unknown cards yet" : "No cards";
     labelEl.textContent = (deckKey === UNKNOWN_DECK_KEY)
       ? "Mark cards with ★ “I don’t know” to build this deck."
       : "";
-    statusEl.textContent = `Deck: ${deckKey} · 0 cards`;
+    const state = loadUnknownState();
+    statusEl.textContent = `Deck: ${deckKey} · 0 cards · Unknown total: ${state.order.length}`;
     setUnknownUI();
     return;
   }
@@ -480,24 +297,18 @@ function render() {
   wordEl.textContent = text;
   labelEl.textContent = showingSpanish ? "Spanish" : "English";
 
-  const audioStatus = ("speechSynthesis" in window)
-    ? (audioOn ? "ON" : "OFF")
-    : "Not supported";
-
-  // unknown count
-  const { order } = loadUnknownState();
-  const unknownCount = order.length;
+  const audioStatus = ("speechSynthesis" in window) ? (audioOn ? "ON" : "OFF") : "Not supported";
+  const state = loadUnknownState();
+  const unknownCount = state.order.length;
 
   statusEl.textContent =
-    `Deck: ${deckKey} · Card ${index + 1}/${deck.length} · Unknown total: ${unknownCount} · Start: ${startSide} · Audio: ${audioStatus}`;
+    `Deck: ${deckKey} · 📍 ${index + 1} / ${deck.length} · Unknown: ${unknownCount} · Start: ${startSide} · Audio: ${audioStatus}` +
+    (storage ? "" : " · (Storage blocked: Unknown deck is session-only)");
 
   setUnknownUI();
   speak(text, lang);
 }
 
-/* =========================
-   ACTIONS
-   ========================= */
 function flipCard() {
   showingSpanish = !showingSpanish;
   render();
@@ -533,16 +344,13 @@ function toggleAudio() {
   render();
 }
 
-/* =========================
-   EVENTS
-   ========================= */
 document.getElementById("prevBtn").addEventListener("click", prevCard);
 document.getElementById("flipBtn").addEventListener("click", flipCard);
 document.getElementById("nextBtn").addEventListener("click", nextCard);
 document.getElementById("shuffleBtn").addEventListener("click", shuffleDeck);
 document.getElementById("startBtn").addEventListener("click", toggleStart);
 document.getElementById("audioBtn").addEventListener("click", toggleAudio);
-unknownBtn.addEventListener("click", toggleUnknownForCurrentCard);
+document.getElementById("unknownBtn").addEventListener("click", toggleUnknownForCurrentCard);
 cardEl.addEventListener("click", flipCard);
 
 document.addEventListener("keydown", (e) => {
@@ -555,23 +363,17 @@ document.addEventListener("keydown", (e) => {
   else if (k === "e") toggleStart();
 });
 
-/* =========================
-   INIT
-   ========================= */
 function init() {
-  // Populate deck dropdown with Unknown deck + daily decks
   deckSelectEl.innerHTML = "";
-  getAllDeckKeysWithUnknownFirst().forEach((k) => {
+  getAllDeckKeys().forEach((k) => {
     const opt = document.createElement("option");
     opt.value = k;
     opt.textContent = k;
     deckSelectEl.appendChild(opt);
   });
 
-  // Default: today deck (not Unknown) unless you want Unknown first
   deckKey = Object.keys(DECKS)[0];
   deckSelectEl.value = deckKey;
-
   deckSelectEl.addEventListener("change", (e) => loadDeck(e.target.value));
 
   startSideLabel.textContent = startSide;
@@ -584,7 +386,5 @@ function init() {
 
 init();
 </script>
-
 </body>
 </html>
-
